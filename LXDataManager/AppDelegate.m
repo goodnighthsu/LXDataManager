@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "LXDataManager.h"
 
 @implementation AppDelegate
 
@@ -14,6 +15,17 @@
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
+    ASIFormDataRequest *request =  [LXDataManager requestWithURL:[NSURL URLWithString:@"http://www.baidu.com"] callback:^(ASIFormDataRequest *request, BOOL status) {
+        //
+        if (status) {
+            NSLog(@"response: %@", request.responseString);
+        }
+    }];
+    
+    [request startAsynchronous];
+    
+    
+    
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
     return YES;
