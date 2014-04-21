@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>D3EEA64E-4144-44FE-9ED6-FC66654B49E6</string>
+	<key>IDESourceControlProjectName</key>
+	<string>LXDataManager</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>502DA527-8612-4A6F-B11A-DA2CE0771315</key>
+		<string>https://github.com/goodnighthsu/LXDataManager.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>LXDataManager.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>502DA527-8612-4A6F-B11A-DA2CE0771315</key>
+		<string>..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/goodnighthsu/LXDataManager.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>502DA527-8612-4A6F-B11A-DA2CE0771315</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>502DA527-8612-4A6F-B11A-DA2CE0771315</string>
+			<key>IDESourceControlWCCName</key>
+			<string>LXDataManager</string>
+		</dict>
+	</array>
+</dict>
+</plist>
