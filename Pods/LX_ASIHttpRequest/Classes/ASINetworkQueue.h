@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "ASIHTTPRequestDelegate.h"
 #import "ASIProgressDelegate.h"
+@class ASIFormDataRequest;
 
 @interface ASINetworkQueue : NSOperationQueue <ASIProgressDelegate, ASIHTTPRequestDelegate, NSCopying> {
 	
@@ -106,7 +107,9 @@
 @property (assign) unsigned long long totalBytesToDownload;
 
 ///增加失败和完成的block
-@property (strong) void(^queueFail)(ASIHTTPRequest *request);
-@property (strong) void(^queueComplete)(ASIHTTPRequest *request);
+@property (strong) void(^queueStart)(ASIFormDataRequest *request);
+@property (strong) void(^queueFail)(ASIFormDataRequest *request);
+@property (strong) void(^queueComplete)(ASIFormDataRequest *request);
+@property (strong) void(^queueProgress)(long long byetes, long long total);
 
 @end

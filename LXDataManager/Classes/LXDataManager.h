@@ -9,33 +9,75 @@
 #import <Foundation/Foundation.h>
 #import "ASIHTTPRequest.h"
 #import "ASIFormDataRequest.h"
+#import "ASINetworkQueue.h"
 #import "MBProgressHUD.h"
 
-@class ASIFormDataRequest;
-@class ASINetworkQueue;
 
-/** Ver 0.0.1
+/// DataRequest ASIFormDataRequest+HUD 
+@interface DataRequest : ASIFormDataRequest
+/**HUD
+ @breif 只有当showHUD==YES，才实例hud。当hud.mode 为进度条类型显示进度（不包含MBProgressHUDModeCustomView）
+ */
+@property (strong, nonatomic) MBProgressHUD *hud;
+
+/**Cache
+ @breif 默认关闭
+ 条件： ASIAskServerIfModifiedCachePolicy|ASIFallbackToCacheIfLoadFailsCachePolicy
+ 保存：ASICachePermanentlyCacheStoragePolicy
+ 可以通过[[ASIDownloadCache sharedCache] clearCachedResponsesForStoragePolicy:ASICachePermanentlyCacheStoragePolicy] 清空
+ */
+@property (assign, nonatomic) BOOL cache;
+
+///默认显示HUD
+@property (assign, nonatomic) BOOL showHUD;
+
+///默认显示Error
+@property (assign, nonatomic) BOOL showError;
+
+@end
+
+@interface DataQueue : ASINetworkQueue
+
+@property (strong, nonatomic) NSArray *requests;
+@property (strong, nonatomic) MBProgressHUD *hud;
+
+/**Cache
+ @breif 默认关闭
+ 条件： ASIAskServerIfModifiedCachePolicy|ASIFallbackToCacheIfLoadFailsCachePolicy
+ 保存：ASICachePermanentlyCacheStoragePolicy
+ 可以通过[[ASIDownloadCache sharedCache] clearCachedResponsesForStoragePolicy:ASICachePermanentlyCacheStoragePolicy] 清空
+ */
+@property (assign, nonatomic) BOOL cache;
+
+///默认显示HUD
+@property (assign, nonatomic) BOOL showHUD;
+
+///默认显示Error
+@property (assign, nonatomic) BOOL showError;
+
+
+@end
+
+
+/** Ver 0.1.1
  数据中心，结合了ASIHttpRequest 和 MBProgress */
 @interface LXDataManager : NSObject <ASIHTTPRequestDelegate>
 
-@property (strong, nonatomic) ASINetworkQueue *asiNetworkQueue;
+@property (strong, nonatomic) NSArray *requests;
 
 + (LXDataManager *)shareDataManager;
 
 /** ASIHttp 使用MBProgressHUD， 添加了ASIHTTP默认的Start，Fail和Complete消息处理
  @param url URL
- @param showHUD 是否显示HUD
- @param showErro 是否显示错误信息
- @param callback block回调提供(ASIFormDataRequest *request)
+ @param callback block回调提供DataQuest 结果， success请求成功与否
+ @return DataRequest
  */
-+ (ASIFormDataRequest *)requestWithURL:(NSURL *)url showHUD:(BOOL)showHUD showError:(BOOL)showError callback:(void (^)(ASIFormDataRequest *request, BOOL))callback;
++ (DataRequest *)requestWithURL:(NSURL *)url callback:(void (^)(DataRequest *request, BOOL success))callback;
 
-/** 默认显示错误信息 */
-+ (ASIFormDataRequest *)requestWithURL:(NSURL *)url showHUD:(BOOL)showHUD callback:(void (^)(ASIFormDataRequest *request, BOOL))callback;
+/** 批量下载*/
++ (DataQueue *)requestWithRequests:(NSArray *)requests callback:(void (^)(DataQueue *dataQueue, BOOL success))callback;
 
-/** 默认显示HUD*/
-+ (ASIFormDataRequest *)requestWithURL:(NSURL *)url callback:(void (^)(ASIFormDataRequest *request,BOOL))callback;
-
-//+ (ASIHTTPRequest *)requestHTTPWithURL:(NSURL *)url showHUD:(BOOL)showHUD callback:(void (^)(ASIHTTPRequest *request))callback;
 
 @end
+
+

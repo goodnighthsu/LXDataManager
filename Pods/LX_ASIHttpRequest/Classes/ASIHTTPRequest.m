@@ -1935,11 +1935,13 @@ static NSOperationQueue *sharedQueue = nil;
 	if (delegate && [delegate respondsToSelector:didStartSelector]) {
 		[delegate performSelector:didStartSelector withObject:self];
 	}
-	#if NS_BLOCKS_AVAILABLE
+    
+#if NS_BLOCKS_AVAILABLE
 	if(startedBlock){
 		startedBlock();
 	}
-	#endif
+#endif
+
 	if (queue && [queue respondsToSelector:@selector(requestStarted:)]) {
 		[queue performSelector:@selector(requestStarted:) withObject:self];
 	}

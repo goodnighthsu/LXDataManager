@@ -8,6 +8,7 @@
 
 #import "ASINetworkQueue.h"
 #import "ASIHTTPRequest.h"
+#import "ASIFormDataRequest.h"
 
 // Private stuff
 @interface ASINetworkQueue ()
@@ -179,11 +180,15 @@
 
 }
 
-- (void)requestStarted:(ASIHTTPRequest *)request
+- (void)requestStarted:(ASIFormDataRequest *)request
 {
 	if ([self requestDidStartSelector]) {
 		[[self delegate] performSelector:[self requestDidStartSelector] withObject:request];
 	}
+    
+    if (self.queueStart) {
+        self.queueStart(request);
+    }
 }
 
 - (void)request:(ASIHTTPRequest *)request didReceiveResponseHeaders:(NSDictionary *)responseHeaders
@@ -200,7 +205,7 @@
 	}
 }
 
-- (void)requestFinished:(ASIHTTPRequest *)request
+- (void)requestFinished:(ASIFormDataRequest *)request
 {
 	[self setRequestsCount:[self requestsCount]-1];
 	if ([self requestDidFinishSelector]) {
@@ -210,28 +215,33 @@
 		if ([self queueDidFinishSelector]) {
 			[[self delegate] performSelector:[self queueDidFinishSelector] withObject:self];
 		}
+        //block
+        if (self.queueComplete) {
+            self.queueComplete(request);
+        }
 	}
-    //block
-    self.queueComplete(request);
 }
 
-- (void)requestFailed:(ASIHTTPRequest *)request
+- (void)requestFailed:(ASIFormDataRequest *)request
 {
 	[self setRequestsCount:[self requestsCount]-1];
 	if ([self requestDidFailSelector]) {
 		[[self delegate] performSelector:[self requestDidFailSelector] withObject:request];
+        
 	}
 	if ([self requestsCount] == 0) {
 		if ([self queueDidFinishSelector]) {
 			[[self delegate] performSelector:[self queueDidFinishSelector] withObject:self];
 		}
+        //block
+        if (self.queueFail) {
+            self.queueFail(request);
+        }
 	}
 	if ([self shouldCancelAllRequestsOnFailure] && [self requestsCount] > 0) {
 		[self cancelAllOperations];
 	}
-    //block
-    self.queueFail(request);
-	
+
 }
 
 
@@ -241,6 +251,12 @@
 	if ([self downloadProgressDelegate]) {
 		[ASIHTTPRequest updateProgressIndicator:&downloadProgressDelegate withProgress:[self bytesDownloadedSoFar] ofTotal:[self totalBytesToDownload]];
 	}
+    
+    if (self.queueProgress) {
+        self.queueProgress([self bytesDownloadedSoFar], [self totalBytesToDownload]);
+    }
+    
+    
 }
 
 - (void)request:(ASIHTTPRequest *)request didSendBytes:(long long)bytes
@@ -249,6 +265,10 @@
 	if ([self uploadProgressDelegate]) {
 		[ASIHTTPRequest updateProgressIndicator:&uploadProgressDelegate withProgress:[self bytesUploadedSoFar] ofTotal:[self totalBytesToUpload]];
 	}
+    if (self.queueProgress) {
+        self.queueProgress([self bytesUploadedSoFar], [self totalBytesToUpload]);
+    }
+    
 }
 
 - (void)request:(ASIHTTPRequest *)request incrementDownloadSizeBy:(long long)newLength
