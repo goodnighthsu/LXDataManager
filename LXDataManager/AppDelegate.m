@@ -7,9 +7,7 @@
 //
 
 #import "AppDelegate.h"
-#import "LXDataManager.h"
-#import <ASIDownloadCache.h>
-#import <ASINetworkQueue.h>
+#import "MainViewController.h"
 
 @implementation AppDelegate
 
@@ -17,44 +15,11 @@
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
+    
+    MainViewController *mainVC = [[MainViewController alloc] initWithNibName:@"MainViewController" bundle:nil];
+    self.window.rootViewController = mainVC;
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
-    
-    //@"http://dldir1.qq.com/qqfile/qq/QQ5.3/10716/QQ5.3.exe"
-    /*
-    DataRequest *request =  [LXDataManager requestWithURL:[NSURL URLWithString:@"http://dldir1.qq.com/qqfile/qq/QQ5.3/10716/QQ5.3.exe"] callback:^(ASIFormDataRequest *request, BOOL success) {
-        //
-        NSLog(@"response: %@", request.responseString);
-
-    }];
-    request.hud.mode = MBProgressHUDModeDeterminate;
-    request.cache = NO;
-    request.showHUD = YES;
-    request.showError = YES;
-    [request startAsynchronous];
-    */
-    
-    
-    
-    DataRequest *request1 = [DataRequest requestWithURL:[NSURL URLWithString:@"http://www.baidu.com/"]];
-    DataRequest *request2 = [DataRequest requestWithURL:[NSURL URLWithString:@"http://www.qq.com/"]];
-    //DataRequest *request3 = [DataRequest requestWithURL:[NSURL URLWithString:@"http://dldir1.qq.com/qqfile/qq/QQ5.3/10716/QQ5.3.exe"]];
-    NSString *path3 = [NSTemporaryDirectory() stringByAppendingPathComponent:@"request2"];
-    [request2 setDownloadDestinationPath:path3];
-    NSArray *requests = @[request1, request2];
-    DataQueue *queue = [LXDataManager requestWithRequests:requests callback:^(DataQueue *dataQueue, BOOL success) {
-        if (success) {
-            //
-            NSLog(@"response: %@",((ASIFormDataRequest *)dataQueue.requests[1]).downloadDestinationPath);
-            return;
-        }
-        
-        NSLog(@"error: %@", requests);
-    }];
-    
-    queue.hud.mode = MBProgressHUDModeIndeterminate;
-    queue.cache = NO;
-    [queue go];
 
 
     return YES;

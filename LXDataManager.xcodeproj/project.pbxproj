@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		05ACCB7E43E34239A91E83DE /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E0012B7BA5F644C396CEC7C0 /* libPods.a */; };
+		3553FCF3195C2F3A001887A2 /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3553FCF1195C2F3A001887A2 /* MainViewController.m */; };
+		357E42F1195D060000E0772E /* LXDataManagerLocalizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 357E42F3195D060000E0772E /* LXDataManagerLocalizable.strings */; };
+		357E42F5195D091C00E0772E /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3553FCF2195C2F3A001887A2 /* MainViewController.xib */; };
 		35963A2F18ACB35600A58B82 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35963A2E18ACB35600A58B82 /* Foundation.framework */; };
 		35963A3118ACB35600A58B82 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35963A3018ACB35600A58B82 /* CoreGraphics.framework */; };
 		35963A3318ACB35600A58B82 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35963A3218ACB35600A58B82 /* UIKit.framework */; };
@@ -35,6 +38,13 @@
 
 /* Begin PBXFileReference section */
 		1819D92266A64E53A8FBC4F5 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = "<group>"; };
+		3553FCF0195C2F3A001887A2 /* MainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MainViewController.h; path = Demo/MainViewController.h; sourceTree = "<group>"; };
+		3553FCF1195C2F3A001887A2 /* MainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MainViewController.m; path = Demo/MainViewController.m; sourceTree = "<group>"; };
+		3553FCF2195C2F3A001887A2 /* MainViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainViewController.xib; path = Demo/MainViewController.xib; sourceTree = "<group>"; };
+		357E42EF195D04D700E0772E /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		357E42F0195D04D700E0772E /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
+		357E42F2195D060000E0772E /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LXDataManagerLocalizable.strings"; sourceTree = "<group>"; };
+		357E42F4195D060400E0772E /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/LXDataManagerLocalizable.strings; sourceTree = "<group>"; };
 		35963A2B18ACB35600A58B82 /* LXDataManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LXDataManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		35963A2E18ACB35600A58B82 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		35963A3018ACB35600A58B82 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -81,6 +91,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		3553FCEF195C2F04001887A2 /* Demo */ = {
+			isa = PBXGroup;
+			children = (
+				3553FCF0195C2F3A001887A2 /* MainViewController.h */,
+				3553FCF1195C2F3A001887A2 /* MainViewController.m */,
+				3553FCF2195C2F3A001887A2 /* MainViewController.xib */,
+			);
+			name = Demo;
+			sourceTree = "<group>";
+		};
+		357E42EC195D04A800E0772E /* Resource */ = {
+			isa = PBXGroup;
+			children = (
+				357E42F3195D060000E0772E /* LXDataManagerLocalizable.strings */,
+			);
+			path = Resource;
+			sourceTree = "<group>";
+		};
 		35963A2218ACB35600A58B82 = {
 			isa = PBXGroup;
 			children = (
@@ -116,6 +144,8 @@
 		35963A3418ACB35600A58B82 /* LXDataManager */ = {
 			isa = PBXGroup;
 			children = (
+				357E42EC195D04A800E0772E /* Resource */,
+				3553FCEF195C2F04001887A2 /* Demo */,
 				35C1F6E018ADD221005CC16C /* Classes */,
 				35963A3D18ACB35600A58B82 /* AppDelegate.h */,
 				35963A3E18ACB35600A58B82 /* AppDelegate.m */,
@@ -209,7 +239,7 @@
 		35963A2318ACB35600A58B82 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = Leon;
 				TargetAttributes = {
 					35963A4518ACB35600A58B82 = {
@@ -223,6 +253,7 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				"zh-Hans",
 			);
 			mainGroup = 35963A2218ACB35600A58B82;
 			productRefGroup = 35963A2C18ACB35600A58B82 /* Products */;
@@ -241,7 +272,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				35963A3918ACB35600A58B82 /* InfoPlist.strings in Resources */,
+				357E42F1195D060000E0772E /* LXDataManagerLocalizable.strings in Resources */,
 				35963A4118ACB35600A58B82 /* Images.xcassets in Resources */,
+				357E42F5195D091C00E0772E /* MainViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -296,6 +329,7 @@
 				35963A3F18ACB35600A58B82 /* AppDelegate.m in Sources */,
 				35963A3B18ACB35600A58B82 /* main.m in Sources */,
 				35C1F6E318ADD221005CC16C /* LXDataManager.m in Sources */,
+				3553FCF3195C2F3A001887A2 /* MainViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -318,10 +352,20 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		357E42F3195D060000E0772E /* LXDataManagerLocalizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				357E42F2195D060000E0772E /* zh-Hans */,
+				357E42F4195D060400E0772E /* en */,
+			);
+			name = LXDataManagerLocalizable.strings;
+			sourceTree = "<group>";
+		};
 		35963A3718ACB35600A58B82 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
 				35963A3818ACB35600A58B82 /* en */,
+				357E42EF195D04D700E0772E /* zh-Hans */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -330,6 +374,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				35963A5118ACB35600A58B82 /* en */,
+				357E42F0195D04D700E0772E /* zh-Hans */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -341,7 +386,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -370,7 +414,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -381,7 +425,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
@@ -404,7 +447,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -442,7 +485,6 @@
 		35963A5B18ACB35600A58B82 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/LXDataManager.app/LXDataManager";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
@@ -465,7 +507,6 @@
 		35963A5C18ACB35600A58B82 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/LXDataManager.app/LXDataManager";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
