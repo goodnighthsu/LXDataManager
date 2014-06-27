@@ -11,6 +11,8 @@
 CGFloat const kErrorDur = 2.0f;
 CGFloat const kSecondsToCache = 60*5;
 
+#define kErrorNetwork  NSLocalizedStringFromTableInBundle(@"Network error, please try again later", @"LXDataManagerLocalizable", [LXDataManager bundle], nil)
+
 ASICacheStoragePolicy const kCachePolicy = ASICachePermanentlyCacheStoragePolicy;
 
 @implementation DataDownloadCache
@@ -183,7 +185,7 @@ ASICacheStoragePolicy const kCachePolicy = ASICachePermanentlyCacheStoragePolicy
             NSLog(@"request error: %@", error.localizedDescription);
             errorHUD = [MBProgressHUD showHUDAddedTo:window animated:YES];
             errorHUD.mode = MBProgressHUDModeText;
-            errorHUD.detailsLabelText = NSLocalizedStringFromTable(@"ERROR_NETWORK", @"LXDataManagerLocalizable", @"");
+            errorHUD.detailsLabelText = kErrorNetwork;
             [errorHUD show:YES];
         }
         
@@ -265,7 +267,7 @@ ASICacheStoragePolicy const kCachePolicy = ASICachePermanentlyCacheStoragePolicy
             NSLog(@"request error: %@", error.localizedDescription);
             errorHUD = [MBProgressHUD showHUDAddedTo:window animated:YES];
             errorHUD.mode = MBProgressHUDModeText;
-            errorHUD.detailsLabelText = NSLocalizedStringFromTable(@"ERROR_NETWORK", @"LXDataManagerLocalizable", @"");
+            errorHUD.detailsLabelText = kErrorNetwork;
             [errorHUD show:YES];
         }
 
@@ -331,6 +333,23 @@ ASICacheStoragePolicy const kCachePolicy = ASICachePermanentlyCacheStoragePolicy
 + (void)clearCache
 {
     [[DataDownloadCache sharedCache] clearCachedResponsesForStoragePolicy:kCachePolicy];
+}
+
+#pragma mark - Resource Bundle
++ (NSBundle *)bundle
+{
+    NSBundle *bundle;
+    
+    NSURL *bundleURL = [[NSBundle mainBundle] URLForResource:@"LXDataManager" withExtension:@"bundle"];
+    
+    if (bundleURL) {
+        // LXDataManager.bundle will likely only exist when used via CocoaPods
+        bundle = [NSBundle bundleWithURL:bundleURL];
+    } else {
+        bundle = [NSBundle mainBundle];
+    }
+    
+    return bundle;
 }
 
 

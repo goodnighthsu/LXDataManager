@@ -5,4 +5,4 @@
   Created by Leon on 14/6/27.
   Copyright (c) 2014年 Leon. All rights reserved.
 */
-"ERROR_NETWORK" = "网络错误，请稍后再试";
+"Network error, please try again later" = "网络错误，请稍后再试";
