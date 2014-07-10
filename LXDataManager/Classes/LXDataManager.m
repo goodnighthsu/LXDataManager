@@ -86,40 +86,78 @@ ASICacheStoragePolicy const kCachePolicy = ASICachePermanentlyCacheStoragePolicy
         //无视服务器的显式“请勿缓存”声明 (例如：cache-control 或者pragma: no-cache 头)
         [[DataDownloadCache sharedCache] setShouldRespectCacheControlHeaders:NO];
         [self setDownloadCache:[DataDownloadCache sharedCache]];
-        //更新修改的
-        [self setCachePolicy:ASIAskServerIfModifiedWhenStaleCachePolicy|ASIAskServerIfModifiedCachePolicy|ASIFallbackToCacheIfLoadFailsCachePolicy];
-        //永久
-        [self setCacheStoragePolicy:kCachePolicy];
-        
-        [self setRequestMethod:@"GET"];
+    }else
+    {
+        [self  setDownloadCache:nil];
     }
 }
 @end
 
 @implementation DataQueue
 
-/*
 - (void)setCache:(BOOL)cache
 {
     _cache = cache;
     if (_cache) {
+        //无视服务器的显式“请勿缓存”声明 (例如：cache-control 或者pragma: no-cache 头)
         //Cache
         [[DataDownloadCache sharedCache] setShouldRespectCacheControlHeaders:NO];
-        //无视服务器的显式“请勿缓存”声明 (例如：cache-control 或者pragma: no-cache 头)
-        for (ASIFormDataRequest *request in self.requests) {
-            [request setDownloadCache:[DataDownloadCache sharedCache]];
-            //更新修改的
-            [request setCachePolicy:ASIAskServerIfModifiedCachePolicy|ASIFallbackToCacheIfLoadFailsCachePolicy];
-            //永久
-            [request setCacheStoragePolicy:ASICachePermanentlyCacheStoragePolicy];
-            
-            [request setRequestMethod:@"GET"];
-        }
-
     }
 }
- */
 
+
+- (void)go
+{
+    //是否cache
+    if (self.cache == YES) {
+
+        
+        //所有都成功cache
+        BOOL allCache = YES;
+        
+        //所有的request都有cache 就直接使用
+        for (DataRequest *request in self.requests) {
+            
+            //配置
+            [request setDownloadCache:[DataDownloadCache sharedCache]];
+            request.cachePolicy = self.cachePolicy;
+            request.cacheStoragePolicy = self.cacheStoragePolicy;
+            request.secondsToCache = self.secondsToCache;
+            request.requestMethod = @"GET";
+            
+            //
+            DataDownloadCache *dataDownloadCache = (DataDownloadCache *)request.downloadCache;
+            if ([dataDownloadCache canUseCachedDataForRequest:request]) {
+                NSString *dataPath = [dataDownloadCache pathToCachedResponseDataForURL:request.url];
+                
+                if ([request downloadDestinationPath]) {
+                    [request setDownloadDestinationPath:dataPath];
+                }else{
+                    request.rawResponseData = [NSMutableData dataWithData:[dataDownloadCache cachedResponseDataForURL:request.url]];
+                }
+                
+            }else{
+                allCache = NO;
+            }
+        }
+        
+        //都有cache完成
+        if (allCache) {
+            self.queueComplete(self, YES);
+            return;
+        }
+    }
+    
+    //不cache 或没有cache
+    for (DataRequest *request in self.requests) {
+        if (!self.cache) {
+            [request setDownloadCache:nil];
+        }
+        [self addOperation:request];
+    }
+    [super go];
+    
+}
 
 @end
 
@@ -128,7 +166,6 @@ ASICacheStoragePolicy const kCachePolicy = ASICachePermanentlyCacheStoragePolicy
 
 + (LXDataManager *)shareDataManager
 {
-   
     static LXDataManager *shareInstance = nil;
     if (shareInstance == nil) {
         @synchronized(self)
@@ -144,18 +181,30 @@ ASICacheStoragePolicy const kCachePolicy = ASICachePermanentlyCacheStoragePolicy
 
 
 #pragma mark - 默认ASIFormDataRequest 处理
-+ (DataRequest *)requestWithURL:(NSURL *)url callback:(void (^)(DataRequest *request, BOOL))callback{
++ (DataRequest *)requestWithURL:(NSURL *)url callback:(void (^)(DataRequest *result, BOOL))callback{
 
-    DataRequest *request = [DataRequest requestWithURL:url];
+    __autoreleasing DataRequest *request = [DataRequest requestWithURL:url];
     //默认
     request.showHUD = YES;
     request.showError = YES;
     request.cache = NO;
+    //默认配置
+    //更新修改的
+    [request setCachePolicy:ASIAskServerIfModifiedWhenStaleCachePolicy|ASIAskServerIfModifiedCachePolicy|ASIFallbackToCacheIfLoadFailsCachePolicy];
+    //永久
+    [request setCacheStoragePolicy:kCachePolicy];
+    //
+    request.secondsToCache = kSecondsToCache;
+    [request setRequestMethod:@"GET"];
+    
     request.errorDur = kErrorDur;
     request.hud = [[MBProgressHUD alloc] init];
-    request.secondsToCache = kSecondsToCache;
+    request.hud.removeFromSuperViewOnHide = YES;
     
-    __weak DataRequest *_request = request;
+    
+    
+    
+    DataRequest __weak *_request = request;
     //Start
     [request setStartedBlock:^{
         if (_request.showHUD) {
@@ -172,8 +221,8 @@ ASICacheStoragePolicy const kCachePolicy = ASICachePermanentlyCacheStoragePolicy
 
     //Fail
     [request setFailedBlock:^{
+ 
         //移除Start的默认HUD
-        [_request.hud removeFromSuperViewOnHide];
         [_request.hud hide:YES];
         
         //显示错误用的HUD
@@ -184,22 +233,21 @@ ASICacheStoragePolicy const kCachePolicy = ASICachePermanentlyCacheStoragePolicy
             NSLog(@"request error code:%li", (long)error.code);
             NSLog(@"request error: %@", error.localizedDescription);
             errorHUD = [MBProgressHUD showHUDAddedTo:window animated:YES];
+            errorHUD.removeFromSuperViewOnHide = YES;
             errorHUD.mode = MBProgressHUDModeText;
             errorHUD.detailsLabelText = kErrorNetwork;
             [errorHUD show:YES];
         }
         
-        [errorHUD removeFromSuperViewOnHide];
         [errorHUD hide:YES afterDelay:_request.errorDur];
-        
         callback(_request, NO);
+         
     }];
     
     //Complete
     [request setCompletionBlock:^{
         //移出hud
         if (_request.showHUD) {
-            [_request.hud removeFromSuperViewOnHide];
             [_request.hud hide:YES];
         }
         //返回
@@ -217,27 +265,28 @@ ASICacheStoragePolicy const kCachePolicy = ASICachePermanentlyCacheStoragePolicy
             _request.hud.progress = progress;
         }
     }];
-    
 
     return request;
 }
 
 
-+ (DataQueue *)requestWithRequests:(NSArray *)requests callback:(void (^)(DataQueue *dataQueue, BOOL success))callback
++ (DataQueue *)requestWithRequests:(NSArray *)requests callback:(void (^)(DataQueue *queue, BOOL success))callback
 {
     //Queue
-    DataQueue *queue = [[DataQueue alloc] init];
+    __autoreleasing DataQueue *queue = [[DataQueue alloc] init];
     queue.requests = requests;
     //默认配置
     queue.showHUD = YES;
     queue.showError = YES;
     queue.errorDur = kErrorDur;
     queue.hud = [[MBProgressHUD alloc] init];
+    queue.hud.removeFromSuperViewOnHide = YES;
+    queue.cache = NO;
     
-    __weak DataQueue *_queue = queue;
+    DataQueue __weak  *_queue = queue;
+    
     //Start
-    [queue setQueueStart:^(ASIFormDataRequest * request) {
-        
+    [queue setQueueStart:^() {
         if (_queue.showHUD) {
             //
             if (_queue.hudSuperView == nil) {
@@ -255,7 +304,6 @@ ASICacheStoragePolicy const kCachePolicy = ASICachePermanentlyCacheStoragePolicy
     //Fail
     [queue setQueueFail:^(ASIHTTPRequest *request) {
         //移除Start的默认HUD
-        [_queue.hud removeFromSuperViewOnHide];
         [_queue.hud hide:YES];
         
         //显示错误用的HUD
@@ -266,26 +314,23 @@ ASICacheStoragePolicy const kCachePolicy = ASICachePermanentlyCacheStoragePolicy
             NSLog(@"request error code:%li", (long)error.code);
             NSLog(@"request error: %@", error.localizedDescription);
             errorHUD = [MBProgressHUD showHUDAddedTo:window animated:YES];
+            errorHUD.removeFromSuperViewOnHide = YES;
             errorHUD.mode = MBProgressHUDModeText;
             errorHUD.detailsLabelText = kErrorNetwork;
             [errorHUD show:YES];
         }
 
-        [errorHUD removeFromSuperViewOnHide];
         [errorHUD hide:YES afterDelay:_queue.errorDur];
-        
+
         callback(_queue, NO);
+         
     }];
     
     //Complete
-    [queue setQueueComplete:^(ASIHTTPRequest *request) {
-        //
+    [queue setQueueComplete:^() {
         if (_queue.hud) {
-            [_queue.hud removeFromSuperViewOnHide];
             [_queue.hud hide:YES];
         }
-        
-        //
         callback(_queue, YES);
     }];
     
@@ -299,12 +344,7 @@ ASICacheStoragePolicy const kCachePolicy = ASICachePermanentlyCacheStoragePolicy
         }
     }];
     
-    
-    //添加任务
-    for (DataRequest *request in requests) {
-        [queue addOperation:request];
-    }
-    
+     
     return queue;
 }
 
@@ -338,7 +378,7 @@ ASICacheStoragePolicy const kCachePolicy = ASICachePermanentlyCacheStoragePolicy
 #pragma mark - Resource Bundle
 + (NSBundle *)bundle
 {
-    NSBundle *bundle;
+    __autoreleasing NSBundle *bundle;
     
     NSURL *bundleURL = [[NSBundle mainBundle] URLForResource:@"LXDataManager" withExtension:@"bundle"];
     

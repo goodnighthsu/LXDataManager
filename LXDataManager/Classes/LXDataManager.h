@@ -32,9 +32,9 @@
 
 /**Cache
  @breif 默认关闭
- 条件：ASIAskServerIfModifiedWhenStaleCachePolicy|ASIAskServerIfModifiedCachePolicy|ASIFallbackToCacheIfLoadFailsCachePolicy
- 保存：ASICachePermanentlyCacheStoragePolicy
- 可以通过[[DataDownloadCache sharedCache] clearCachedResponsesForStoragePolicy:ASICachePermanentlyCacheStoragePolicy] 清空
+ 默认方针：
+ cachePolicy：ASIAskServerIfModifiedWhenStaleCachePolicy|ASIAskServerIfModifiedCachePolicy|ASIFallbackToCacheIfLoadFailsCachePolicy
+ cacheStoragePolicy：ASICachePermanentlyCacheStoragePolicy
  */
 @property (assign, nonatomic) BOOL cache;
 
@@ -59,18 +59,26 @@
 
 
 ///DataQueue
-@interface DataQueue : ASINetworkQueue
+@interface DataQueue : ASINetworkQueue <ASIProgressDelegate>
 
-@property (strong, nonatomic) NSArray *requests;
+@property (weak, nonatomic) NSArray *requests;
 @property (strong, nonatomic) MBProgressHUD *hud;
 
-/**Cache Deprecated
- @breif 默认关闭, 开启之后默认无视服务器设置
- 条件： ASIAskServerIfModifiedCachePolicy|ASIFallbackToCacheIfLoadFailsCachePolicy
- 保存：ASICachePermanentlyCacheStoragePolicy
- 可以通过[[ASIDownloadCache sharedCache] clearCachedResponsesForStoragePolicy:ASICachePermanentlyCacheStoragePolicy] 清空
+/**Cache
+ @breif 默认关闭, 开启之后默认无视服务器设置, 所有request使用相同的cachePolicy，ASICachesPolicy
+ 默认方针：
+ cachePolicy：ASIAskServerIfModifiedWhenStaleCachePolicy|ASIAskServerIfModifiedCachePolicy|ASIFallbackToCacheIfLoadFailsCachePolicy
+ cacheStoragePolicy：ASICachePermanentlyCacheStoragePolicy
  */
-@property (assign, nonatomic) BOOL cache __deprecated;
+@property (assign, nonatomic) BOOL cache;
+
+@property (assign, nonatomic) ASICachePolicy cachePolicy;
+
+@property (assign, nonatomic) ASICacheStoragePolicy cacheStoragePolicy;
+
+@property (assign, nonatomic) CGFloat secondsToCache;
+
+
 
 ///默认显示HUD
 @property (assign, nonatomic) BOOL showHUD;
@@ -104,10 +112,11 @@
  @param callback block回调提供DataQuest 结果， success请求成功与否
  @return DataRequest
  */
-+ (DataRequest *)requestWithURL:(NSURL *)url callback:(void (^)(DataRequest *request, BOOL success))callback;
++ (DataRequest *)requestWithURL:(NSURL *)url callback:(void (^)(DataRequest *result, BOOL success))callback;
 
 /** 批量下载*/
-+ (DataQueue *)requestWithRequests:(NSArray *)requests callback:(void (^)(DataQueue *dataQueue, BOOL success))callback;
++ (DataQueue *)requestWithRequests:(NSArray *)requests callback:(void (^)(DataQueue *result, BOOL success))callback;
+
 
 ///Cache Size
 + (NSString *)cacheSize;

@@ -10,25 +10,25 @@
 #define COCOAPODS_POD_AVAILABLE_LX_ASIHttpRequest
 #define COCOAPODS_VERSION_MAJOR_LX_ASIHttpRequest 1
 #define COCOAPODS_VERSION_MINOR_LX_ASIHttpRequest 9
-#define COCOAPODS_VERSION_PATCH_LX_ASIHttpRequest 1
+#define COCOAPODS_VERSION_PATCH_LX_ASIHttpRequest 3
 
 // LX_ASIHttpRequest/ASIWebPageRequest
 #define COCOAPODS_POD_AVAILABLE_LX_ASIHttpRequest_ASIWebPageRequest
 #define COCOAPODS_VERSION_MAJOR_LX_ASIHttpRequest_ASIWebPageRequest 1
 #define COCOAPODS_VERSION_MINOR_LX_ASIHttpRequest_ASIWebPageRequest 9
-#define COCOAPODS_VERSION_PATCH_LX_ASIHttpRequest_ASIWebPageRequest 1
+#define COCOAPODS_VERSION_PATCH_LX_ASIHttpRequest_ASIWebPageRequest 3
 
 // LX_ASIHttpRequest/CloudFiles
 #define COCOAPODS_POD_AVAILABLE_LX_ASIHttpRequest_CloudFiles
 #define COCOAPODS_VERSION_MAJOR_LX_ASIHttpRequest_CloudFiles 1
 #define COCOAPODS_VERSION_MINOR_LX_ASIHttpRequest_CloudFiles 9
-#define COCOAPODS_VERSION_PATCH_LX_ASIHttpRequest_CloudFiles 1
+#define COCOAPODS_VERSION_PATCH_LX_ASIHttpRequest_CloudFiles 3
 
 // LX_ASIHttpRequest/S3
 #define COCOAPODS_POD_AVAILABLE_LX_ASIHttpRequest_S3
 #define COCOAPODS_VERSION_MAJOR_LX_ASIHttpRequest_S3 1
 #define COCOAPODS_VERSION_MINOR_LX_ASIHttpRequest_S3 9
-#define COCOAPODS_VERSION_PATCH_LX_ASIHttpRequest_S3 1
+#define COCOAPODS_VERSION_PATCH_LX_ASIHttpRequest_S3 3
 
 // MBProgressHUD
 #define COCOAPODS_POD_AVAILABLE_MBProgressHUD

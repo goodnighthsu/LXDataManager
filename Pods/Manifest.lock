@@ -1,25 +1,25 @@
 PODS:
-  - LX_ASIHttpRequest (1.9.1):
+  - LX_ASIHttpRequest (1.9.3):
     - LX_ASIHttpRequest/ASIWebPageRequest
     - LX_ASIHttpRequest/CloudFiles
     - LX_ASIHttpRequest/S3
     - Reachability
-  - LX_ASIHttpRequest/ASIWebPageRequest (1.9.1):
+  - LX_ASIHttpRequest/ASIWebPageRequest (1.9.3):
     - Reachability
-  - LX_ASIHttpRequest/CloudFiles (1.9.1):
+  - LX_ASIHttpRequest/CloudFiles (1.9.3):
     - Reachability
-  - LX_ASIHttpRequest/S3 (1.9.1):
+  - LX_ASIHttpRequest/S3 (1.9.3):
     - Reachability
   - MBProgressHUD (0.8)
   - Reachability (3.1.1)
 
 DEPENDENCIES:
-  - LX_ASIHttpRequest (~> 1.9.1)
+  - LX_ASIHttpRequest (~> 1.9)
   - MBProgressHUD (~> 0.8)
 
 SPEC CHECKSUMS:
-  LX_ASIHttpRequest: 15fc7425f1230b029162d079064a43a58cb7c570
-  MBProgressHUD: 2bbc6f470111daf7f3eaa4eb12b8cbf01c4c0622
-  Reachability: be4883bb93f31e38266ae3365e5600a317aae735
+  LX_ASIHttpRequest: bca7ac0a123a722c43712c8e5bb6ab558d9257da
+  MBProgressHUD: c356980b0cd097f19acec959b49dca5eb8ec31be
+  Reachability: 8e9635e3cb4f98e7f825e51147f677ecc694d0e7
 
-COCOAPODS: 0.32.1
+COCOAPODS: 0.33.1

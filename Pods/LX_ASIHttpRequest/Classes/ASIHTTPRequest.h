@@ -1001,4 +1001,9 @@ typedef void (^ASIDataBlock)(NSData *data);
 @property (retain) ASIDataDecompressor *dataDecompressor;
 @property (assign) BOOL shouldWaitToInflateCompressedResponses;
 
+/**检查Operation是否开始
+ @brief 使用HeadRequest的时候，可能直接使用cache，而跳过operation没有开始queue。所以需要在markfinished方法中标识finish之前，检查Queue有没有开始
+ */
+@property (nonatomic, assign) BOOL isOperationStart;
+
 @end

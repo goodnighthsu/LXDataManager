@@ -12,8 +12,8 @@
 
 // Private stuff
 @interface ASINetworkQueue ()
-	- (void)resetProgressDelegate:(id *)progressDelegate;
-	@property (assign) int requestsCount;
+- (void)resetProgressDelegate:(id *)progressDelegate;
+@property (assign) int requestsCount;
 @end
 
 @implementation ASINetworkQueue
@@ -36,10 +36,16 @@
 - (void)dealloc
 {
 	//We need to clear the queue on any requests that haven't got around to cleaning up yet, as otherwise they'll try to let us know if something goes wrong, and we'll be long gone by then
-	for (ASIHTTPRequest *request in [self operations]) {
-		[request setQueue:nil];
-	}
-	[userInfo release];
+    /*
+     for (ASIHTTPRequest *request in [self operations]) {
+     [request setQueue:nil];
+     }
+     [userInfo release];
+     */
+    
+    //清空新增加的block
+    [self cleanBlock];
+    
 	[super dealloc];
 }
 
@@ -65,6 +71,10 @@
 
 - (void)go
 {
+    if (self.queueStart) {
+        self.queueStart();
+    }
+    
 	[self setSuspended:NO];
 }
 
@@ -134,7 +144,7 @@
 	if (![operation isKindOfClass:[ASIHTTPRequest class]]) {
 		[NSException raise:@"AttemptToAddInvalidRequest" format:@"Attempted to add an object that was not an ASIHTTPRequest to an ASINetworkQueue"];
 	}
-		
+    
 	[self setRequestsCount:[self requestsCount]+1];
 	
 	ASIHTTPRequest *request = (ASIHTTPRequest *)operation;
@@ -150,7 +160,7 @@
 		// Instead, they'll update the total progress if and when they receive a content-length header
 		if ([[request requestMethod] isEqualToString:@"GET"]) {
 			if ([self isSuspended]) {
-				ASIHTTPRequest *HEADRequest = [request HEADRequest];
+                ASIHTTPRequest *HEADRequest = [request HEADRequest];
 				[self addHEADOperation:HEADRequest];
 				[request addDependency:HEADRequest];
 				if ([request shouldResetDownloadProgress]) {
@@ -161,8 +171,8 @@
 		}
 		[request buildPostBody];
 		[self request:nil incrementUploadSizeBy:[request postLength]];
-
-
+        
+        
 	} else {
 		[self request:nil incrementDownloadSizeBy:1];
 		[self request:nil incrementUploadSizeBy:1];
@@ -177,7 +187,7 @@
 	
 	[request setQueue:self];
 	[super addOperation:request];
-
+    
 }
 
 - (void)requestStarted:(ASIFormDataRequest *)request
@@ -185,10 +195,6 @@
 	if ([self requestDidStartSelector]) {
 		[[self delegate] performSelector:[self requestDidStartSelector] withObject:request];
 	}
-    
-    if (self.queueStart) {
-        self.queueStart(request);
-    }
 }
 
 - (void)request:(ASIHTTPRequest *)request didReceiveResponseHeaders:(NSDictionary *)responseHeaders
@@ -207,17 +213,19 @@
 
 - (void)requestFinished:(ASIFormDataRequest *)request
 {
-	[self setRequestsCount:[self requestsCount]-1];
-	if ([self requestDidFinishSelector]) {
+    [self setRequestsCount:[self requestsCount]-1];
+    if ([self requestDidFinishSelector]) {
 		[[self delegate] performSelector:[self requestDidFinishSelector] withObject:request];
 	}
 	if ([self requestsCount] == 0) {
 		if ([self queueDidFinishSelector]) {
 			[[self delegate] performSelector:[self queueDidFinishSelector] withObject:self];
 		}
+        
         //block
         if (self.queueComplete) {
-            self.queueComplete(request);
+            self.queueComplete();
+            [self cleanBlock];
         }
 	}
 }
@@ -229,19 +237,28 @@
 		[[self delegate] performSelector:[self requestDidFailSelector] withObject:request];
         
 	}
+    
+    //block
+    if (self.queueFail) {
+        self.queueFail(request);
+    }
+    
 	if ([self requestsCount] == 0) {
 		if ([self queueDidFinishSelector]) {
 			[[self delegate] performSelector:[self queueDidFinishSelector] withObject:self];
 		}
+        
         //block
-        if (self.queueFail) {
-            self.queueFail(request);
+        if (self.queueComplete) {
+            self.queueComplete();
+            [self cleanBlock];
         }
 	}
 	if ([self shouldCancelAllRequestsOnFailure] && [self requestsCount] > 0) {
 		[self cancelAllOperations];
+        [self cleanBlock];
 	}
-
+    
 }
 
 
@@ -255,8 +272,6 @@
     if (self.queueProgress) {
         self.queueProgress([self bytesDownloadedSoFar], [self totalBytesToDownload]);
     }
-    
-    
 }
 
 - (void)request:(ASIHTTPRequest *)request didSendBytes:(long long)bytes
@@ -265,10 +280,10 @@
 	if ([self uploadProgressDelegate]) {
 		[ASIHTTPRequest updateProgressIndicator:&uploadProgressDelegate withProgress:[self bytesUploadedSoFar] ofTotal:[self totalBytesToUpload]];
 	}
+    
     if (self.queueProgress) {
         self.queueProgress([self bytesUploadedSoFar], [self totalBytesToUpload]);
     }
-    
 }
 
 - (void)request:(ASIHTTPRequest *)request incrementDownloadSizeBy:(long long)newLength
@@ -301,22 +316,22 @@
 - (BOOL)respondsToSelector:(SEL)selector
 {
 	// We handle certain methods differently because whether our delegate implements them or not can affect how the request should behave
-
+    
 	// If the delegate implements this, the request will stop to wait for credentials
 	if (selector == @selector(authenticationNeededForRequest:)) {
 		if ([[self delegate] respondsToSelector:@selector(authenticationNeededForRequest:)]) {
 			return YES;
 		}
 		return NO;
-
-	// If the delegate implements this, the request will to wait for credentials
+        
+        // If the delegate implements this, the request will to wait for credentials
 	} else if (selector == @selector(proxyAuthenticationNeededForRequest:)) {
 		if ([[self delegate] respondsToSelector:@selector(proxyAuthenticationNeededForRequest:)]) {
 			return YES;
 		}
 		return NO;
-
-	// If the delegate implements requestWillRedirectSelector, the request will stop to allow the delegate to change the url
+        
+        // If the delegate implements requestWillRedirectSelector, the request will stop to allow the delegate to change the url
 	} else if (selector == @selector(request:willRedirectToURL:)) {
 		if ([self requestWillRedirectSelector] && [[self delegate] respondsToSelector:[self requestWillRedirectSelector]]) {
 			return YES;
@@ -325,6 +340,7 @@
 	}
 	return [super respondsToSelector:selector];
 }
+
 
 #pragma mark NSCopying
 
@@ -347,6 +363,36 @@
 }
 
 
+#pragma mark - Clean Block
+- (void)cleanBlock
+{
+    for (ASIHTTPRequest *request in [self operations]) {
+		[request setQueue:nil];
+	}
+	[userInfo release];
+    
+    if (queueStart) {
+        [queueStart release];
+        queueStart = nil;
+    }
+    
+    if (queueFail) {
+        [queueFail release];
+        queueFail = nil;
+    }
+    
+    if (queueComplete) {
+        [queueComplete release];
+        queueComplete = nil;
+    }
+    
+    if (queueProgress) {
+        [queueProgress release];
+        queueProgress = nil;
+    }
+}
+
+
 @synthesize requestsCount;
 @synthesize bytesUploadedSoFar;
 @synthesize totalBytesToUpload;
@@ -364,4 +410,9 @@
 @synthesize delegate;
 @synthesize showAccurateProgress;
 @synthesize userInfo;
+
+@synthesize queueStart;
+@synthesize queueFail;
+@synthesize queueComplete;
+@synthesize queueProgress;
 @end

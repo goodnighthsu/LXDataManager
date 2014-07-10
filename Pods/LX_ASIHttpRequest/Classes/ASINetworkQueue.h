@@ -15,7 +15,7 @@
 	
 	// Delegate will get didFail + didFinish messages (if set)
 	id delegate;
-
+    
 	// Will be called when a request starts with the request as the argument
 	SEL requestDidStartSelector;
 	
@@ -26,7 +26,7 @@
 	// Will be called when a request is about to redirect
 	// Should take the form request:willRedirectToURL:, where the first argument is the request, and the second the new url
 	SEL requestWillRedirectSelector;
-
+    
 	// Will be called when a request completes with the request as the argument
 	SEL requestDidFinishSelector;
 	
@@ -44,7 +44,7 @@
 	
 	// Total amount to be uploaded for all requests in this queue - requests add to this figure as they work out how much data they have to transmit
 	unsigned long long totalBytesToUpload;
-
+    
 	// Download progress indicator, probably an NSProgressIndicator or UIProgressView
 	id downloadProgressDelegate;
 	
@@ -63,11 +63,11 @@
 	// When NO, this request will only update the progress indicator when it completes
 	// When YES, this request will update the progress indicator according to how much data it has received so far
 	// When YES, the queue will first perform HEAD requests for all GET requests in the queue, so it can calculate the total download size before it starts
-	// NO means better performance, because it skips this step for GET requests, and it won't waste time updating the progress indicator until a request completes 
+	// NO means better performance, because it skips this step for GET requests, and it won't waste time updating the progress indicator until a request completes
 	// Set to YES if the size of a requests in the queue varies greatly for much more accurate results
 	// Default for requests in the queue is NO
 	BOOL showAccurateProgress;
-
+    
 	// Storage container for additional queue information.
 	NSDictionary *userInfo;
 	
@@ -107,9 +107,9 @@
 @property (assign) unsigned long long totalBytesToDownload;
 
 ///增加失败和完成的block
-@property (strong) void(^queueStart)(ASIFormDataRequest *request);
-@property (strong) void(^queueFail)(ASIFormDataRequest *request);
-@property (strong) void(^queueComplete)(ASIFormDataRequest *request);
-@property (strong) void(^queueProgress)(long long byetes, long long total);
+@property (copy) void(^queueStart)();
+@property (copy) void(^queueFail)(ASIFormDataRequest *request);
+@property (copy) void(^queueComplete)();
+@property (copy) void(^queueProgress)(long long byetes, long long total);
 
 @end

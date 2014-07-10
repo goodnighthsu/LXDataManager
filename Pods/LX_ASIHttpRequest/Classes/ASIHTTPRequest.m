@@ -308,6 +308,9 @@ static NSOperationQueue *sharedQueue = nil;
 	[self setURL:newURL];
 	[self setCancelledLock:[[[NSRecursiveLock alloc] init] autorelease]];
 	[self setDownloadCache:[[self class] defaultCache]];
+    
+    self.isOperationStart = NO;
+    
 	return self;
 }
 
@@ -809,6 +812,8 @@ static NSOperationQueue *sharedQueue = nil;
 
 - (void)start
 {
+    //Operation开始
+    self.isOperationStart = YES;
 	[self setInProgress:YES];
 	[self performSelector:@selector(main) onThread:[[self class] threadForRequest:self] withObject:nil waitUntilDone:NO];
 }
@@ -886,7 +891,8 @@ static NSOperationQueue *sharedQueue = nil;
 			[self buildPostBody];
 		}
 		
-		if (![[self requestMethod] isEqualToString:@"GET"]) {
+        //同时允许GET和HEAD request 使用cache
+		if (![[self requestMethod] isEqualToString:@"GET"]&&![[self requestMethod] isEqualToString:@"HEAD"]) {
 			[self setDownloadCache:nil];
 		}
 		
@@ -1650,6 +1656,15 @@ static NSOperationQueue *sharedQueue = nil;
 	
 	[headRequest setMainRequest:self];
 	[headRequest setRequestMethod:@"HEAD"];
+    
+    //Queue addOperation
+    //Queue需要请求多个url的时候，并且需要精确的进度的时候，会先生成一个headRequest 请求url header 用来获取的下载内容的大小
+    //原方法并不支持Queue的离线，所以headerRequest 没有cache，当断线的时候就直接报错而不使用cache
+    //现在headRequest同样复制request的cache相关属性
+    [headRequest setDownloadCache:self.downloadCache];
+    [headRequest setCachePolicy:self.cachePolicy];
+    [headRequest setCacheStoragePolicy:self.cacheStoragePolicy];
+    
 	return headRequest;
 }
 
@@ -3524,6 +3539,12 @@ static NSOperationQueue *sharedQueue = nil;
 
 - (void)markAsFinished
 {
+    //检查Queue是否开始
+    if (!self.isOperationStart) {
+        return;
+    }
+    
+    
 	// Autoreleased requests may well be dealloced here otherwise
 	CFRetain(self);
 
