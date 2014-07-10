@@ -13,7 +13,7 @@ CGFloat const kSecondsToCache = 60*5;
 
 #define kErrorNetwork  NSLocalizedStringFromTableInBundle(@"Network error, please try again later", @"LXDataManagerLocalizable", [LXDataManager bundle], nil)
 
-ASICacheStoragePolicy const kCachePolicy = ASICachePermanentlyCacheStoragePolicy;
+ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStoragePolicy;
 
 @implementation DataDownloadCache
 
@@ -88,37 +88,29 @@ ASICacheStoragePolicy const kCachePolicy = ASICachePermanentlyCacheStoragePolicy
         [self setDownloadCache:[DataDownloadCache sharedCache]];
     }else
     {
-        [self  setDownloadCache:nil];
+        [self setDownloadCache:nil];
     }
 }
 @end
 
 @implementation DataQueue
 
-- (void)setCache:(BOOL)cache
-{
-    _cache = cache;
-    if (_cache) {
-        //无视服务器的显式“请勿缓存”声明 (例如：cache-control 或者pragma: no-cache 头)
-        //Cache
-        [[DataDownloadCache sharedCache] setShouldRespectCacheControlHeaders:NO];
-    }
-}
-
-
 - (void)go
 {
     //是否cache
     if (self.cache == YES) {
 
-        
+
         //所有都成功cache
         BOOL allCache = YES;
         
+        //配置
+        //无视服务器的显式“请勿缓存”声明 (例如：cache-control 或者pragma: no-cache 头)
+        //Cache
+        [[DataDownloadCache sharedCache] setShouldRespectCacheControlHeaders:NO];
         //所有的request都有cache 就直接使用
         for (DataRequest *request in self.requests) {
-            
-            //配置
+ 
             [request setDownloadCache:[DataDownloadCache sharedCache]];
             request.cachePolicy = self.cachePolicy;
             request.cacheStoragePolicy = self.cacheStoragePolicy;
@@ -192,7 +184,7 @@ ASICacheStoragePolicy const kCachePolicy = ASICachePermanentlyCacheStoragePolicy
     //更新修改的
     [request setCachePolicy:ASIAskServerIfModifiedWhenStaleCachePolicy|ASIAskServerIfModifiedCachePolicy|ASIFallbackToCacheIfLoadFailsCachePolicy];
     //永久
-    [request setCacheStoragePolicy:kCachePolicy];
+    [request setCacheStoragePolicy:kCacheStoragePolicy];
     //
     request.secondsToCache = kSecondsToCache;
     [request setRequestMethod:@"GET"];
@@ -279,9 +271,19 @@ ASICacheStoragePolicy const kCachePolicy = ASICachePermanentlyCacheStoragePolicy
     queue.showHUD = YES;
     queue.showError = YES;
     queue.errorDur = kErrorDur;
+    //Cache
+    queue.cache = NO;
+    //更新修改的
+    queue.cachePolicy = ASIAskServerIfModifiedWhenStaleCachePolicy|ASIAskServerIfModifiedCachePolicy|ASIFallbackToCacheIfLoadFailsCachePolicy;
+    //永久
+    queue.cacheStoragePolicy = kCacheStoragePolicy;
+    //
+    queue.secondsToCache = kSecondsToCache;
+    
     queue.hud = [[MBProgressHUD alloc] init];
     queue.hud.removeFromSuperViewOnHide = YES;
-    queue.cache = NO;
+    
+
     
     DataQueue __weak  *_queue = queue;
     
@@ -372,7 +374,7 @@ ASICacheStoragePolicy const kCachePolicy = ASICachePermanentlyCacheStoragePolicy
 
 + (void)clearCache
 {
-    [[DataDownloadCache sharedCache] clearCachedResponsesForStoragePolicy:kCachePolicy];
+    [[DataDownloadCache sharedCache] clearCachedResponsesForStoragePolicy:kCacheStoragePolicy];
 }
 
 #pragma mark - Resource Bundle
