@@ -10,29 +10,29 @@
 	<string>LXDataManager</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>502DA527-8612-4A6F-B11A-DA2CE0771315</key>
+		<key>413012BC837126B3E8DF025E1BE01FBDEDC683F7</key>
 		<string>https://github.com/goodnighthsu/LXDataManager.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>LXDataManager.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>502DA527-8612-4A6F-B11A-DA2CE0771315</key>
+		<key>413012BC837126B3E8DF025E1BE01FBDEDC683F7</key>
 		<string>..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/goodnighthsu/LXDataManager.git</string>
 	<key>IDESourceControlProjectVersion</key>
-	<integer>110</integer>
+	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>502DA527-8612-4A6F-B11A-DA2CE0771315</string>
+	<string>413012BC837126B3E8DF025E1BE01FBDEDC683F7</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>502DA527-8612-4A6F-B11A-DA2CE0771315</string>
+			<string>413012BC837126B3E8DF025E1BE01FBDEDC683F7</string>
 			<key>IDESourceControlWCCName</key>
 			<string>LXDataManager</string>
 		</dict>

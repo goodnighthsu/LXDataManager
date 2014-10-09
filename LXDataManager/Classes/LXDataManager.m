@@ -156,22 +156,6 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
 
 @implementation LXDataManager
 
-+ (LXDataManager *)shareDataManager
-{
-    static LXDataManager *shareInstance = nil;
-    if (shareInstance == nil) {
-        @synchronized(self)
-        {
-            if (shareInstance == nil) {
-                shareInstance = [[self alloc] init];
-            }
-        }
-    }
-    return shareInstance;
-}
-
-
-
 #pragma mark - 默认ASIFormDataRequest 处理
 + (DataRequest *)requestWithURL:(NSURL *)url callback:(void (^)(DataRequest *result, BOOL))callback{
 

@@ -22,7 +22,7 @@
 @end
 
 
-
+#pragma mark - DataRequest
 /// DataRequest ASIFormDataRequest+HUD 
 @interface DataRequest : ASIFormDataRequest
 /**HUD
@@ -57,11 +57,11 @@
 @end
 
 
-
+#pragma mark - DataQueue
 ///DataQueue
 @interface DataQueue : ASINetworkQueue <ASIProgressDelegate>
 
-@property (weak, nonatomic) NSArray *requests;
+@property (strong, nonatomic) NSArray *requests;
 @property (strong, nonatomic) MBProgressHUD *hud;
 
 /**Cache
@@ -99,13 +99,12 @@
 
 @end
 
-
+#pragma mark - LXDataManager
 ///数据中心，结合了ASIHttpRequest 和 MBProgress
 @interface LXDataManager : NSObject <ASIHTTPRequestDelegate>
 
 @property (strong, nonatomic) NSArray *requests;
 
-+ (LXDataManager *)shareDataManager;
 
 /** ASIHttp 使用MBProgressHUD， 添加了ASIHTTP默认的Start，Fail和Complete消息处理
  @param url URL
