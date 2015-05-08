@@ -21,9 +21,8 @@
 
 @end
 
-
 #pragma mark - DataRequest
-/// DataRequest ASIFormDataRequest+HUD 
+/// DataRequest ASIFormDataRequest+HUD
 @interface DataRequest : ASIFormDataRequest
 /**HUD
  @breif 只有当showHUD==YES，才实例hud。当hud.mode 为进度条类型显示进度（不包含MBProgressHUDModeCustomView）
@@ -33,7 +32,7 @@
 /**Cache
  @breif 默认关闭
  默认方针：
- cachePolicy：ASIAskServerIfModifiedWhenStaleCachePolicy|ASIAskServerIfModifiedCachePolicy|ASIFallbackToCacheIfLoadFailsCachePolicy
+ cachePolicy：ASIAskServerIfModifiedWhenStaleCachePolicy|ASIFallbackToCacheIfLoadFailsCachePolicy
  cacheStoragePolicy：ASICachePermanentlyCacheStoragePolicy
  */
 @property (assign, nonatomic) BOOL cache;
@@ -56,7 +55,6 @@
 
 @end
 
-
 #pragma mark - DataQueue
 ///DataQueue
 @interface DataQueue : ASINetworkQueue <ASIProgressDelegate>
@@ -71,6 +69,9 @@
  cacheStoragePolicy：ASICachePermanentlyCacheStoragePolicy
  */
 @property (assign, nonatomic) BOOL cache;
+
+///是否使用缓存数据
+@property (assign, nonatomic) BOOL useCache;
 
 @property (assign, nonatomic) ASICachePolicy cachePolicy;
 
@@ -105,7 +106,6 @@
 
 @property (strong, nonatomic) NSArray *requests;
 
-
 /** ASIHttp 使用MBProgressHUD， 添加了ASIHTTP默认的Start，Fail和Complete消息处理
  @param url URL
  @param callback block回调提供DataQuest 结果， success请求成功与否
@@ -115,7 +115,6 @@
 
 /** 批量下载*/
 + (DataQueue *)requestWithRequests:(NSArray *)requests callback:(void (^)(DataQueue *result, BOOL success))callback;
-
 
 ///Cache Size
 + (NSString *)cacheSize;

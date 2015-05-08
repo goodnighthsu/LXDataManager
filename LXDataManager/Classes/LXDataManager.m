@@ -9,54 +9,56 @@
 #import "LXDataManager.h"
 
 CGFloat const kErrorDur = 2.0f;
-CGFloat const kSecondsToCache = 60*5;
+//注意 float 取值范围
+CGFloat const kSecondsToCache = 60.0*5.0;
 
 #define kErrorNetwork  NSLocalizedStringFromTableInBundle(@"Network error, please try again later", @"LXDataManagerLocalizable", [LXDataManager bundle], nil)
 
 ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStoragePolicy;
 
+#pragma mark - DataDownloadCache
 @implementation DataDownloadCache
 
 - (BOOL)isCachedDataCurrentForRequest:(ASIHTTPRequest *)request
 {
-	[[self accessLock] lock];
-	if (![self storagePath]) {
-		[[self accessLock] unlock];
-		return NO;
-	}
-	NSDictionary *cachedHeaders = [self cachedResponseHeadersForURL:[request url]];
-	if (!cachedHeaders) {
-		[[self accessLock] unlock];
-		return NO;
-	}
-	NSString *dataPath = [self pathToCachedResponseDataForURL:[request url]];
-	if (!dataPath) {
-		[[self accessLock] unlock];
-		return NO;
-	}
+    [[self accessLock] lock];
+    if (![self storagePath]) {
+        [[self accessLock] unlock];
+        return NO;
+    }
+    NSDictionary *cachedHeaders = [self cachedResponseHeadersForURL:[request url]];
+    if (!cachedHeaders) {
+        [[self accessLock] unlock];
+        return NO;
+    }
+    NSString *dataPath = [self pathToCachedResponseDataForURL:[request url]];
+    if (!dataPath) {
+        [[self accessLock] unlock];
+        return NO;
+    }
     
-	// New content is not different
-	if ([request responseStatusCode] == 304) {
-		[[self accessLock] unlock];
-		return YES;
-	}
+    // New content is not different
+    if ([request responseStatusCode] == 304) {
+        [[self accessLock] unlock];
+        return YES;
+    }
     
-	// If we already have response headers for this request, check to see if the new content is different
-	// We check [request complete] so that we don't end up comparing response headers from a redirection with these
-	if ([request responseHeaders] && [request complete]) {
+    // If we already have response headers for this request, check to see if the new content is different
+    // We check [request complete] so that we don't end up comparing response headers from a redirection with these
+    if ([request responseHeaders] && [request complete]) {
         
-		// If the Etag or Last-Modified date are different from the one we have, we'll have to fetch this resource again
-		NSArray *headersToCompare = [NSArray arrayWithObjects:@"Etag",@"Last-Modified",nil];
-		for (NSString *header in headersToCompare) {
-			if (![[[request responseHeaders] objectForKey:header] isEqualToString:[cachedHeaders objectForKey:header]]) {
-				[[self accessLock] unlock];
-				return NO;
-			}
-		}
-	}
+        // If the Etag or Last-Modified date are different from the one we have, we'll have to fetch this resource again
+        NSArray *headersToCompare = [NSArray arrayWithObjects:@"Etag",@"Last-Modified",nil];
+        for (NSString *header in headersToCompare) {
+            if (![[[request responseHeaders] objectForKey:header] isEqualToString:[cachedHeaders objectForKey:header]]) {
+                [[self accessLock] unlock];
+                return NO;
+            }
+        }
+    }
     
     //修改就算 shouldRespectCacheControlHeaders = NO，当服务器声明不缓存的时候，本地secondsToCache也有效
-	// Look for X-ASIHTTPRequest-Expires header to see if the content is out of date
+    // Look for X-ASIHTTPRequest-Expires header to see if the content is out of date
     NSNumber *expires = [cachedHeaders objectForKey:@"X-ASIHTTPRequest-Expires"];
     if (expires) {
         if ([[NSDate dateWithTimeIntervalSince1970:[expires doubleValue]] timeIntervalSinceNow] >= 0) {
@@ -70,7 +72,7 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
     }
     
     [[self accessLock] unlock];
-	return YES;
+    return YES;
 }
 
 @end
@@ -93,14 +95,14 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
 }
 @end
 
+
+#pragma mark - DataQueue
 @implementation DataQueue
 
 - (void)go
 {
     //是否cache
     if (self.cache == YES) {
-
-
         //所有都成功cache
         BOOL allCache = YES;
         
@@ -110,7 +112,6 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
         [[DataDownloadCache sharedCache] setShouldRespectCacheControlHeaders:NO];
         //所有的request都有cache 就直接使用
         for (DataRequest *request in self.requests) {
- 
             [request setDownloadCache:[DataDownloadCache sharedCache]];
             request.cachePolicy = self.cachePolicy;
             request.cacheStoragePolicy = self.cacheStoragePolicy;
@@ -135,6 +136,7 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
         
         //都有cache完成
         if (allCache) {
+            self.useCache = YES;
             self.queueComplete(self, YES);
             return;
         }
@@ -147,28 +149,36 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
         }
         [self addOperation:request];
     }
-    [super go];
+
+    //没有reqeusts 直接完成
+    if (self.requests.count == 0) {
+        //第一次下载成功没有使用cache的数据
+        self.useCache = NO;
+        self.queueComplete(self, YES);
+        return;
+    }
     
+    [super go];
 }
 
 @end
 
-
+#pragma mark - LXDataManager
 @implementation LXDataManager
 
 #pragma mark - 默认ASIFormDataRequest 处理
 + (DataRequest *)requestWithURL:(NSURL *)url callback:(void (^)(DataRequest *result, BOOL))callback{
-
     __autoreleasing DataRequest *request = [DataRequest requestWithURL:url];
     //默认
     request.showHUD = YES;
     request.showError = YES;
     request.cache = NO;
     //默认配置
-    //更新修改的
-    [request setCachePolicy:ASIAskServerIfModifiedWhenStaleCachePolicy|ASIAskServerIfModifiedCachePolicy|ASIFallbackToCacheIfLoadFailsCachePolicy];
+    //失效的、错误的 （不检查更新，检查更新会产生服务器请求）
+    [request setCachePolicy:ASIAskServerIfModifiedWhenStaleCachePolicy|ASIFallbackToCacheIfLoadFailsCachePolicy];
     //永久
-    [request setCacheStoragePolicy:kCacheStoragePolicy];
+    request.cacheStoragePolicy = ASICachePermanentlyCacheStoragePolicy;
+
     //
     request.secondsToCache = kSecondsToCache;
     [request setRequestMethod:@"GET"];
@@ -177,57 +187,67 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
     request.hud = [[MBProgressHUD alloc] init];
     request.hud.removeFromSuperViewOnHide = YES;
     
-    
-    
-    
     DataRequest __weak *_request = request;
     //Start
     [request setStartedBlock:^{
         if (_request.showHUD) {
+            
             if (_request.hudSuperView == nil) {
                 UIWindow *window =[UIApplication sharedApplication].keyWindow;
                 _request.hudSuperView = window;
-
             }
-            [_request.hudSuperView addSubview:_request.hud];
-            [_request.hudSuperView bringSubviewToFront:_request.hud];
-            [_request.hud show:YES];
+            
+            if (_request.hudSuperView != nil) {
+                for (UIView *subView in _request.hudSuperView.subviews) {
+                    if ([subView isKindOfClass:[MBProgressHUD class]]) {
+                        [subView removeFromSuperview];
+                    }
+                }
+                
+                [_request.hudSuperView addSubview:_request.hud];
+                [_request.hudSuperView bringSubviewToFront:_request.hud];
+                [_request.hud show:YES];
+            }
         }
     }];
-
+    
     //Fail
     [request setFailedBlock:^{
- 
         //移除Start的默认HUD
         [_request.hud hide:YES];
-        
+
         //显示错误用的HUD
         MBProgressHUD *errorHUD = nil;
         UIWindow *window =[UIApplication sharedApplication].keyWindow;
-        if (window != nil && _request.showError) {
+        if (window != nil && _request.showError && !_request.cancelled) {
             NSError *error = [_request error];
             NSLog(@"request error code:%li", (long)error.code);
             NSLog(@"request error: %@", error.localizedDescription);
+            
             errorHUD = [MBProgressHUD showHUDAddedTo:window animated:YES];
             errorHUD.removeFromSuperViewOnHide = YES;
             errorHUD.mode = MBProgressHUDModeText;
             errorHUD.detailsLabelText = kErrorNetwork;
             [errorHUD show:YES];
+            
+            [errorHUD hide:YES afterDelay:_request.errorDur];
         }
         
-        [errorHUD hide:YES afterDelay:_request.errorDur];
-        callback(_request, NO);
-         
+        if (callback != nil) {
+             callback(_request, NO);
+        }
     }];
     
     //Complete
     [request setCompletionBlock:^{
-        //移出hud
+        //移除hud
         if (_request.showHUD) {
             [_request.hud hide:YES];
         }
         //返回
-        callback(_request, YES);
+        if (callback != nil) {
+            callback(_request, YES);
+        }
     }];
     
     //进度
@@ -241,11 +261,12 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
             _request.hud.progress = progress;
         }
     }];
-
+    
     return request;
 }
 
 
+#pragma mark 默认DataQueue处理
 + (DataQueue *)requestWithRequests:(NSArray *)requests callback:(void (^)(DataQueue *queue, BOOL success))callback
 {
     //Queue
@@ -258,7 +279,7 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
     //Cache
     queue.cache = NO;
     //更新修改的
-    queue.cachePolicy = ASIAskServerIfModifiedWhenStaleCachePolicy|ASIAskServerIfModifiedCachePolicy|ASIFallbackToCacheIfLoadFailsCachePolicy;
+    queue.cachePolicy = ASIAskServerIfModifiedWhenStaleCachePolicy|ASIFallbackToCacheIfLoadFailsCachePolicy;
     //永久
     queue.cacheStoragePolicy = kCacheStoragePolicy;
     //
@@ -267,26 +288,32 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
     queue.hud = [[MBProgressHUD alloc] init];
     queue.hud.removeFromSuperViewOnHide = YES;
     
-
-    
     DataQueue __weak  *_queue = queue;
     
     //Start
     [queue setQueueStart:^() {
         if (_queue.showHUD) {
             //
-            if (_queue.hudSuperView == nil) {
-                UIWindow *window =[UIApplication sharedApplication].keyWindow;
+            UIWindow *window =[UIApplication sharedApplication].keyWindow;
+            if (_queue.hudSuperView == nil && window != nil) {
                 _queue.hudSuperView = window;
             }
+            
             //Cache
-            [_queue.hudSuperView addSubview:_queue.hud];
-            [_queue.hudSuperView bringSubviewToFront:_queue.hud];
-            [_queue.hud show:YES];
+            if (_queue.hudSuperView != nil) {
+                for (UIView *subView in _queue.hudSuperView.subviews) {
+                    if ([subView isKindOfClass:[MBProgressHUD class]]) {
+                        [subView removeFromSuperview];
+                    }
+                }
+                
+                [_queue.hudSuperView addSubview:_queue.hud];
+                [_queue.hudSuperView bringSubviewToFront:_queue.hud];
+                [_queue.hud show:YES];
+            }
         }
     }];
     
-
     //Fail
     [queue setQueueFail:^(ASIHTTPRequest *request) {
         //移除Start的默认HUD
@@ -295,7 +322,7 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
         //显示错误用的HUD
         MBProgressHUD *errorHUD = nil;
         UIWindow *window =[UIApplication sharedApplication].keyWindow;
-        if (window != nil && _queue.showError) {
+        if (window != nil && _queue.showError && !request.cancelled) {
             NSError *error = [request error];
             NSLog(@"request error code:%li", (long)error.code);
             NSLog(@"request error: %@", error.localizedDescription);
@@ -304,12 +331,11 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
             errorHUD.mode = MBProgressHUDModeText;
             errorHUD.detailsLabelText = kErrorNetwork;
             [errorHUD show:YES];
+            [errorHUD hide:YES afterDelay:_queue.errorDur];
         }
-
-        [errorHUD hide:YES afterDelay:_queue.errorDur];
-
-        callback(_queue, NO);
-         
+        if (callback != nil) {
+            callback(_queue, NO);
+        }
     }];
     
     //Complete
@@ -317,9 +343,10 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
         if (_queue.hud) {
             [_queue.hud hide:YES];
         }
-        callback(_queue, YES);
+        if (callback != nil) {
+            callback(_queue, YES);
+        }
     }];
-    
     
     //Progress
     [queue setShowAccurateProgress:YES];
@@ -330,11 +357,10 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
         }
     }];
     
-     
     return queue;
 }
 
-
+#pragma mark - CacheSize
 + (NSString *)cacheSize
 {
     NSString *folderPath = [[DataDownloadCache sharedCache] storagePath];
@@ -356,6 +382,7 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
 }
 
 
+#pragma mark - ClearCache
 + (void)clearCache
 {
     [[DataDownloadCache sharedCache] clearCachedResponsesForStoragePolicy:kCacheStoragePolicy];
@@ -377,9 +404,6 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
     
     return bundle;
 }
-
-
-
 @end
 
 
