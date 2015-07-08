@@ -14,13 +14,6 @@
 
 #import "MBProgressHUD.h"
 
-/**DownloadCache
- @breif 修改了isCachedDataCurrentForRequest方法，当服务器声明不缓存的时候，本地secondsToCache也有效
- */
-@interface DataDownloadCache : ASIDownloadCache
-
-@end
-
 #pragma mark - DataRequest
 /// DataRequest ASIFormDataRequest+HUD
 @interface DataRequest : ASIFormDataRequest

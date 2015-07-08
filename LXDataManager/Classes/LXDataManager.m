@@ -16,67 +16,6 @@ CGFloat const kSecondsToCache = 60.0*5.0;
 
 ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStoragePolicy;
 
-#pragma mark - DataDownloadCache
-@implementation DataDownloadCache
-
-- (BOOL)isCachedDataCurrentForRequest:(ASIHTTPRequest *)request
-{
-    [[self accessLock] lock];
-    if (![self storagePath]) {
-        [[self accessLock] unlock];
-        return NO;
-    }
-    NSDictionary *cachedHeaders = [self cachedResponseHeadersForURL:[request url]];
-    if (!cachedHeaders) {
-        [[self accessLock] unlock];
-        return NO;
-    }
-    NSString *dataPath = [self pathToCachedResponseDataForURL:[request url]];
-    if (!dataPath) {
-        [[self accessLock] unlock];
-        return NO;
-    }
-    
-    // New content is not different
-    if ([request responseStatusCode] == 304) {
-        [[self accessLock] unlock];
-        return YES;
-    }
-    
-    // If we already have response headers for this request, check to see if the new content is different
-    // We check [request complete] so that we don't end up comparing response headers from a redirection with these
-    if ([request responseHeaders] && [request complete]) {
-        
-        // If the Etag or Last-Modified date are different from the one we have, we'll have to fetch this resource again
-        NSArray *headersToCompare = [NSArray arrayWithObjects:@"Etag",@"Last-Modified",nil];
-        for (NSString *header in headersToCompare) {
-            if (![[[request responseHeaders] objectForKey:header] isEqualToString:[cachedHeaders objectForKey:header]]) {
-                [[self accessLock] unlock];
-                return NO;
-            }
-        }
-    }
-    
-    //修改就算 shouldRespectCacheControlHeaders = NO，当服务器声明不缓存的时候，本地secondsToCache也有效
-    // Look for X-ASIHTTPRequest-Expires header to see if the content is out of date
-    NSNumber *expires = [cachedHeaders objectForKey:@"X-ASIHTTPRequest-Expires"];
-    if (expires) {
-        if ([[NSDate dateWithTimeIntervalSince1970:[expires doubleValue]] timeIntervalSinceNow] >= 0) {
-            [[self accessLock] unlock];
-            return YES;
-        }else{
-            // No explicit expiration time sent by the server
-            [[self accessLock] unlock];
-            return NO;
-        }
-    }
-    
-    [[self accessLock] unlock];
-    return YES;
-}
-
-@end
-
 @implementation DataRequest
 
 //只能在这里设置Request
@@ -85,9 +24,7 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
     _cache = cache;
     if (_cache) {
         //Cache
-        //无视服务器的显式“请勿缓存”声明 (例如：cache-control 或者pragma: no-cache 头)
-        [[DataDownloadCache sharedCache] setShouldRespectCacheControlHeaders:NO];
-        [self setDownloadCache:[DataDownloadCache sharedCache]];
+        [self setDownloadCache:[ASIDownloadCache sharedCache]];
     }else
     {
         [self setDownloadCache:nil];
@@ -107,19 +44,16 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
         BOOL allCache = YES;
         
         //配置
-        //无视服务器的显式“请勿缓存”声明 (例如：cache-control 或者pragma: no-cache 头)
-        //Cache
-        [[DataDownloadCache sharedCache] setShouldRespectCacheControlHeaders:NO];
         //所有的request都有cache 就直接使用
         for (DataRequest *request in self.requests) {
-            [request setDownloadCache:[DataDownloadCache sharedCache]];
+            [request setDownloadCache:[ASIDownloadCache sharedCache]];
             request.cachePolicy = self.cachePolicy;
             request.cacheStoragePolicy = self.cacheStoragePolicy;
             request.secondsToCache = self.secondsToCache;
             request.requestMethod = @"GET";
             
             //
-            DataDownloadCache *dataDownloadCache = (DataDownloadCache *)request.downloadCache;
+            ASIDownloadCache *dataDownloadCache = (ASIDownloadCache *)request.downloadCache;
             if ([dataDownloadCache canUseCachedDataForRequest:request]) {
                 NSString *dataPath = [dataDownloadCache pathToCachedResponseDataForURL:request.url];
                 
@@ -363,7 +297,7 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
 #pragma mark - CacheSize
 + (NSString *)cacheSize
 {
-    NSString *folderPath = [[DataDownloadCache sharedCache] storagePath];
+    NSString *folderPath = [[ASIDownloadCache sharedCache] storagePath];
     folderPath = [folderPath stringByAppendingPathComponent:@"PermanentStore"];
     NSArray *contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:folderPath error:nil];
     NSEnumerator *contentsEnumurator = [contents objectEnumerator];
@@ -385,7 +319,7 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
 #pragma mark - ClearCache
 + (void)clearCache
 {
-    [[DataDownloadCache sharedCache] clearCachedResponsesForStoragePolicy:kCacheStoragePolicy];
+    [[ASIDownloadCache sharedCache] clearCachedResponsesForStoragePolicy:kCacheStoragePolicy];
 }
 
 #pragma mark - Resource Bundle
