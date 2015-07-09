@@ -11,9 +11,9 @@
 #import <ASIFormDataRequest.h>
 #import <ASINetworkQueue.h>
 #import <ASIDownloadCache.h>
-
 #import "MBProgressHUD.h"
 
+///Ver 0.3.2
 #pragma mark - DataRequest
 /// DataRequest ASIFormDataRequest+HUD
 @interface DataRequest : ASIFormDataRequest
@@ -71,7 +71,6 @@
 @property (assign, nonatomic) ASICacheStoragePolicy cacheStoragePolicy;
 
 @property (assign, nonatomic) CGFloat secondsToCache;
-
 
 
 ///默认显示HUD

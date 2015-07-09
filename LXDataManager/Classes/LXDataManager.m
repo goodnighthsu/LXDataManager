@@ -9,8 +9,6 @@
 #import "LXDataManager.h"
 
 CGFloat const kErrorDur = 2.0f;
-//注意 float 取值范围
-CGFloat const kSecondsToCache = 60.0*5.0;
 
 #define kErrorNetwork  NSLocalizedStringFromTableInBundle(@"Network error, please try again later", @"LXDataManagerLocalizable", [LXDataManager bundle], nil)
 
@@ -113,8 +111,6 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
     //永久
     request.cacheStoragePolicy = ASICachePermanentlyCacheStoragePolicy;
 
-    //
-    request.secondsToCache = kSecondsToCache;
     [request setRequestMethod:@"GET"];
     
     request.errorDur = kErrorDur;
@@ -216,8 +212,6 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
     queue.cachePolicy = ASIAskServerIfModifiedWhenStaleCachePolicy|ASIFallbackToCacheIfLoadFailsCachePolicy;
     //永久
     queue.cacheStoragePolicy = kCacheStoragePolicy;
-    //
-    queue.secondsToCache = kSecondsToCache;
     
     queue.hud = [[MBProgressHUD alloc] init];
     queue.hud.removeFromSuperViewOnHide = YES;
