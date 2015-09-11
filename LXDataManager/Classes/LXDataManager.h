@@ -13,7 +13,7 @@
 #import <ASIDownloadCache.h>
 #import "MBProgressHUD.h"
 
-///Ver 0.3.2
+///Ver 0.3.3
 #pragma mark - DataRequest
 /// DataRequest ASIFormDataRequest+HUD
 @interface DataRequest : ASIFormDataRequest
@@ -54,24 +54,6 @@
 
 @property (strong, nonatomic) NSArray *requests;
 @property (strong, nonatomic) MBProgressHUD *hud;
-
-/**Cache
- @breif 默认关闭, 开启之后默认无视服务器设置, 所有request使用相同的cachePolicy，ASICachesPolicy
- 默认方针：
- cachePolicy：ASIAskServerIfModifiedWhenStaleCachePolicy|ASIAskServerIfModifiedCachePolicy|ASIFallbackToCacheIfLoadFailsCachePolicy
- cacheStoragePolicy：ASICachePermanentlyCacheStoragePolicy
- */
-@property (assign, nonatomic) BOOL cache;
-
-///是否使用缓存数据
-@property (assign, nonatomic) BOOL useCache;
-
-@property (assign, nonatomic) ASICachePolicy cachePolicy;
-
-@property (assign, nonatomic) ASICacheStoragePolicy cacheStoragePolicy;
-
-@property (assign, nonatomic) CGFloat secondsToCache;
-
 
 ///默认显示HUD
 @property (assign, nonatomic) BOOL showHUD;

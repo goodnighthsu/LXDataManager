@@ -36,56 +36,13 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
 
 - (void)go
 {
-    //是否cache
-    if (self.cache == YES) {
-        //所有都成功cache
-        BOOL allCache = YES;
-        
-        //配置
-        //所有的request都有cache 就直接使用
-        for (DataRequest *request in self.requests) {
-            [request setDownloadCache:[ASIDownloadCache sharedCache]];
-            request.cachePolicy = self.cachePolicy;
-            request.cacheStoragePolicy = self.cacheStoragePolicy;
-            request.secondsToCache = self.secondsToCache;
-            request.requestMethod = @"GET";
-            
-            //
-            ASIDownloadCache *dataDownloadCache = (ASIDownloadCache *)request.downloadCache;
-            if ([dataDownloadCache canUseCachedDataForRequest:request]) {
-                NSString *dataPath = [dataDownloadCache pathToCachedResponseDataForURL:request.url];
-                
-                if ([request downloadDestinationPath]) {
-                    [request setDownloadDestinationPath:dataPath];
-                }else{
-                    request.rawResponseData = [NSMutableData dataWithData:[dataDownloadCache cachedResponseDataForURL:request.url]];
-                }
-                
-            }else{
-                allCache = NO;
-            }
-        }
-        
-        //都有cache完成
-        if (allCache) {
-            self.useCache = YES;
-            self.queueComplete(self, YES);
-            return;
-        }
-    }
-    
     //不cache 或没有cache
     for (DataRequest *request in self.requests) {
-        if (!self.cache) {
-            [request setDownloadCache:nil];
-        }
         [self addOperation:request];
     }
 
     //没有reqeusts 直接完成
     if (self.requests.count == 0) {
-        //第一次下载成功没有使用cache的数据
-        self.useCache = NO;
         self.queueComplete(self, YES);
         return;
     }
@@ -206,13 +163,7 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
     queue.showHUD = YES;
     queue.showError = YES;
     queue.errorDur = kErrorDur;
-    //Cache
-    queue.cache = NO;
-    //更新修改的
-    queue.cachePolicy = ASIAskServerIfModifiedWhenStaleCachePolicy|ASIFallbackToCacheIfLoadFailsCachePolicy;
-    //永久
-    queue.cacheStoragePolicy = kCacheStoragePolicy;
-    
+        
     queue.hud = [[MBProgressHUD alloc] init];
     queue.hud.removeFromSuperViewOnHide = YES;
     
