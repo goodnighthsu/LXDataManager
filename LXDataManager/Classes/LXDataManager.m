@@ -28,6 +28,35 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
         [self setDownloadCache:nil];
     }
 }
+
+- (void)startAsynchronous
+{
+    [self directUseLocalCache];
+    [super startAsynchronous];
+}
+
+- (void)startSynchronous
+{
+    [self directUseLocalCache];
+    [super startSynchronous];
+}
+
+//直接使用本地的cache，不进入队列
+- (void)directUseLocalCache
+{
+    if (self.useLocalCache) {
+        NSData *data = [[ASIDownloadCache sharedCache] cachedResponseDataForURL:self.url];
+        if (data != nil) {
+            [self setRawResponseData:[NSMutableData dataWithData:data]];
+            if (self.callback != nil) {
+                self.callback(self, YES);
+            }
+            return;
+        }
+    }
+    
+}
+
 @end
 
 
@@ -62,6 +91,8 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
     request.showHUD = YES;
     request.showError = YES;
     request.cache = NO;
+    request.useLocalCache = NO;
+    request.callback = callback;
     //默认配置
     //失效的、错误的 （不检查更新，检查更新会产生服务器请求）
     [request setCachePolicy:ASIAskServerIfModifiedWhenStaleCachePolicy|ASIFallbackToCacheIfLoadFailsCachePolicy];

@@ -13,7 +13,7 @@
 #import <ASIDownloadCache.h>
 #import "MBProgressHUD.h"
 
-///Ver 0.3.3
+///Ver 0.4.0
 #pragma mark - DataRequest
 /// DataRequest ASIFormDataRequest+HUD
 @interface DataRequest : ASIFormDataRequest
@@ -45,6 +45,14 @@
 
 ///默认显示Error
 @property (assign, nonatomic) BOOL showError;
+
+/**直接使用本地缓存
+ @breif 直接使用本地的缓存，速度比使用ASIOnlyLoadIfNotCachedCachePolicy ASIAskServerIfModifiedCachePolicy快, 如果没有缓存依据当前的CachePolicy继续执行
+ */
+@property (assign, nonatomic) BOOL useLocalCache;
+
+///回调方法
+@property (copy, nonatomic) void (^callback)(DataRequest *request, BOOL success);
 
 @end
 
