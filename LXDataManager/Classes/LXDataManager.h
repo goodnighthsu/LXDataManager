@@ -13,7 +13,7 @@
 #import <ASIDownloadCache.h>
 #import "MBProgressHUD.h"
 
-///Ver 0.4.0
+///Ver 0.4.1
 #pragma mark - DataRequest
 /// DataRequest ASIFormDataRequest+HUD
 @interface DataRequest : ASIFormDataRequest
