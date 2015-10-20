@@ -111,7 +111,8 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
         if (_request.showHUD) {
             
             if (_request.hudSuperView == nil) {
-                UIWindow *window =[UIApplication sharedApplication].keyWindow;
+                //避免Keyboard遮挡
+                UIWindow *window = [[UIApplication sharedApplication].windows lastObject];
                 _request.hudSuperView = window;
             }
             
