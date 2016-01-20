@@ -112,7 +112,9 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
             
             if (_request.hudSuperView == nil) {
                 //避免Keyboard遮挡
-                UIWindow *window = [[UIApplication sharedApplication].windows lastObject];
+                //不使用 [[UIApplication sharedApplication].windows lastObject]
+                //参看http://help.bugtags.com/hc/kb/article/77692/
+                UIWindow *window = [LXDataManager lastWindow];
                 _request.hudSuperView = window;
             }
             
@@ -137,7 +139,7 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
 
         //显示错误用的HUD
         MBProgressHUD *errorHUD = nil;
-        UIWindow *window =[UIApplication sharedApplication].keyWindow;
+        UIWindow *window = [LXDataManager lastWindow];
         if (window != nil && _request.showError && !_request.cancelled) {
             NSError *error = [_request error];
             NSLog(@"request error code:%li", (long)error.code);
@@ -184,6 +186,19 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
     return request;
 }
 
++ (UIWindow *)lastWindow
+{
+    NSArray *windows = [UIApplication sharedApplication].windows;
+    for(UIWindow *window in [windows reverseObjectEnumerator]) {
+        
+        if ([window isKindOfClass:[UIWindow class]] &&
+            CGRectEqualToRect(window.bounds, [UIScreen mainScreen].bounds))
+            
+            return window;
+    }
+    
+    return [UIApplication sharedApplication].keyWindow;
+}
 
 #pragma mark 默认DataQueue处理
 + (DataQueue *)requestWithRequests:(NSArray *)requests callback:(void (^)(DataQueue *queue, BOOL success))callback
@@ -205,7 +220,7 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
     [queue setQueueStart:^() {
         if (_queue.showHUD) {
             //
-            UIWindow *window =[UIApplication sharedApplication].keyWindow;
+            UIWindow *window = [LXDataManager lastWindow];
             if (_queue.hudSuperView == nil && window != nil) {
                 _queue.hudSuperView = window;
             }
@@ -232,7 +247,7 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
         
         //显示错误用的HUD
         MBProgressHUD *errorHUD = nil;
-        UIWindow *window =[UIApplication sharedApplication].keyWindow;
+        UIWindow *window = [LXDataManager lastWindow];
         if (window != nil && _queue.showError && !request.cancelled) {
             NSError *error = [request error];
             NSLog(@"request error code:%li", (long)error.code);
