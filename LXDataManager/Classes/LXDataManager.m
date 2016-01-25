@@ -190,12 +190,13 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
 + (UIWindow *)lastWindow
 {
     NSArray *windows = [UIApplication sharedApplication].windows;
-    for(UIWindow *window in [windows reverseObjectEnumerator]) {
-        
+    for(UIWindow *window in [windows reverseObjectEnumerator])
+    {
         if ([window isKindOfClass:[UIWindow class]] &&
-            CGRectEqualToRect(window.bounds, [UIScreen mainScreen].bounds))
-            
+            CGRectEqualToRect(window.bounds, [UIScreen mainScreen].bounds) && [NSStringFromClass([window class]) isEqualToString:@"UITextEffectsWindow"])
+        {
             return window;
+        }
     }
     
     return [UIApplication sharedApplication].keyWindow;
