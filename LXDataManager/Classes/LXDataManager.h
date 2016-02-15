@@ -88,6 +88,14 @@
 
 @property (strong, nonatomic) NSArray *requests;
 
+///全局默认错误提示
+@property (strong, nonatomic) NSString *defaultErrorNetwork;
+///全局默认错误提示时间，默认2s
+@property (assign, nonatomic) CGFloat defaultErrorDur;
+
+///单例
++ (LXDataManager *)shareDataManager;
+
 /** ASIHttp 使用MBProgressHUD， 添加了ASIHTTP默认的Start，Fail和Complete消息处理
  @param url URL
  @param callback block回调提供DataQuest 结果， success请求成功与否

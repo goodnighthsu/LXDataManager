@@ -15,7 +15,10 @@ CGFloat const kErrorDur = 2.0f;
 
 ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStoragePolicy;
 
+
 @implementation DataRequest
+
+
 
 //只能在这里设置Request
 - (void)setCache:(BOOL)cache
@@ -85,6 +88,20 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
 #pragma mark - LXDataManager
 @implementation LXDataManager
 
++ (LXDataManager *)shareDataManager
+{
+    static LXDataManager *dataManager = nil;
+    static dispatch_once_t predicate;
+    dispatch_once(&predicate, ^{
+        dataManager = [[self alloc] init];
+        dataManager.defaultErrorNetwork = kErrorNetwork;
+        dataManager.defaultErrorDur = kErrorDur;
+    });
+    
+    return dataManager;
+    
+}
+
 #pragma mark - 默认ASIFormDataRequest 处理
 + (DataRequest *)requestWithURL:(NSURL *)url callback:(void (^)(DataRequest *result, BOOL))callback{
     __autoreleasing DataRequest *request = [DataRequest requestWithURL:url];
@@ -102,7 +119,7 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
 
     [request setRequestMethod:@"GET"];
     
-    request.errorDur = kErrorDur;
+    request.errorDur = [LXDataManager shareDataManager].defaultErrorDur;
     request.hud = [[MBProgressHUD alloc] init];
     request.hud.removeFromSuperViewOnHide = YES;
     
@@ -142,14 +159,10 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
         MBProgressHUD *errorHUD = nil;
         UIWindow *window = [LXDataManager lastWindow];
         if (window != nil && _request.showError && !_request.cancelled) {
-            NSError *error = [_request error];
-            NSLog(@"request error code:%li", (long)error.code);
-            NSLog(@"request error: %@", error.localizedDescription);
-            
             errorHUD = [MBProgressHUD showHUDAddedTo:window animated:YES];
             errorHUD.removeFromSuperViewOnHide = YES;
             errorHUD.mode = MBProgressHUDModeText;
-            errorHUD.detailsLabelText = kErrorNetwork;
+            errorHUD.detailsLabelText = [LXDataManager shareDataManager].defaultErrorNetwork;
             [errorHUD show:YES];
             
             [errorHUD hide:YES afterDelay:_request.errorDur];
@@ -211,7 +224,7 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
     //默认配置
     queue.showHUD = YES;
     queue.showError = YES;
-    queue.errorDur = kErrorDur;
+    queue.errorDur = [LXDataManager shareDataManager].defaultErrorDur;
         
     queue.hud = [[MBProgressHUD alloc] init];
     queue.hud.removeFromSuperViewOnHide = YES;
@@ -257,7 +270,7 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
             errorHUD = [MBProgressHUD showHUDAddedTo:window animated:YES];
             errorHUD.removeFromSuperViewOnHide = YES;
             errorHUD.mode = MBProgressHUDModeText;
-            errorHUD.detailsLabelText = kErrorNetwork;
+            errorHUD.detailsLabelText = [LXDataManager shareDataManager].defaultErrorNetwork;
             [errorHUD show:YES];
             [errorHUD hide:YES afterDelay:_queue.errorDur];
         }
