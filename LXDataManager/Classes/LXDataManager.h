@@ -13,7 +13,7 @@
 #import <ASIDownloadCache.h>
 #import "MBProgressHUD.h"
 
-///Ver 0.4.2
+///Ver 0.5.0
 #pragma mark - HUDView
 @protocol HUD
 
