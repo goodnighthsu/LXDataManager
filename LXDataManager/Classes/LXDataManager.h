@@ -14,13 +14,31 @@
 #import "MBProgressHUD.h"
 
 ///Ver 0.4.2
+#pragma mark - HUDView
+@protocol HUD
+
+- (void)show:(BOOL)ani;
+- (void)hide:(BOOL)ani;
+- (void)setProgress:(CGFloat)progress;
+
+@end
+
+@interface HUDView <HUD> : UIView
+
+- (void)show:(BOOL)ani;
+- (void)hide:(BOOL)ani;
+- (void)setProgress:(CGFloat)progress;
+
+@end
+
+
 #pragma mark - DataRequest
 /// DataRequest ASIFormDataRequest+HUD
 @interface DataRequest : ASIFormDataRequest
 /**HUD
  @breif 只有当showHUD==YES，才实例hud。当hud.mode 为进度条类型显示进度（不包含MBProgressHUDModeCustomView）
  */
-@property (strong, nonatomic) MBProgressHUD *hud;
+@property (strong, nonatomic) HUDView *hud;
 
 /**Cache
  @breif 默认关闭
@@ -61,7 +79,7 @@
 @interface DataQueue : ASINetworkQueue <ASIProgressDelegate>
 
 @property (strong, nonatomic) NSArray *requests;
-@property (strong, nonatomic) MBProgressHUD *hud;
+@property (strong, nonatomic) HUDView *hud;
 
 ///默认显示HUD
 @property (assign, nonatomic) BOOL showHUD;
@@ -92,6 +110,8 @@
 @property (strong, nonatomic) NSString *defaultErrorNetwork;
 ///全局默认错误提示时间，默认2s
 @property (assign, nonatomic) CGFloat defaultErrorDur;
+///全局默认HUD Class，默认使用MBProgressHUD
+@property (copy, nonatomic) NSString *defaultHudClassName;
 
 ///单例
 + (LXDataManager *)shareDataManager;

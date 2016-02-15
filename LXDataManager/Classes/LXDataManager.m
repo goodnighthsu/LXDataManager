@@ -11,7 +11,8 @@
 CGFloat const kErrorDur = 2.0f;
 
 //#define kErrorNetwork  NSLocalizedStringFromTableInBundle(@"Network error, please try again later", @"LXDataManagerLocalizable", [LXDataManager bundle], nil)
-#define kErrorNetwork  @"网络错误，请稍后再试"
+#define kErrorNetwork  @"网络未连接，请稍后再试"
+#define kHUDClass @"MBProgressHUD"
 
 ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStoragePolicy;
 
@@ -96,6 +97,7 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
         dataManager = [[self alloc] init];
         dataManager.defaultErrorNetwork = kErrorNetwork;
         dataManager.defaultErrorDur = kErrorDur;
+        dataManager.defaultHudClassName = kHUDClass;
     });
     
     return dataManager;
@@ -120,8 +122,14 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
     [request setRequestMethod:@"GET"];
     
     request.errorDur = [LXDataManager shareDataManager].defaultErrorDur;
-    request.hud = [[MBProgressHUD alloc] init];
-    request.hud.removeFromSuperViewOnHide = YES;
+    //HUD
+    NSString *hudName = [LXDataManager shareDataManager].defaultHudClassName;
+    HUDView *hud = [[NSClassFromString(hudName) alloc] init];
+    if ([hud isKindOfClass:[MBProgressHUD class]])
+    {
+        ((MBProgressHUD *)hud).removeFromSuperViewOnHide = YES;
+    }
+    request.hud = hud;
     
     DataRequest __weak *_request = request;
     //Start
@@ -190,10 +198,16 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
     __block CGFloat progress;
     [request setBytesReceivedBlock:^(unsigned long long size, unsigned long long total) {
         //
-        if (_request.showHUD && (_request.hud.mode == MBProgressHUDModeAnnularDeterminate || _request.hud.mode == MBProgressHUDModeDeterminateHorizontalBar || _request.hud.mode == MBProgressHUDModeDeterminate)) {
+        if (_request.showHUD) {
             download += size;
             progress = (float)download/total;
-            _request.hud.progress = progress;
+            if ([_request.hud isKindOfClass:[MBProgressHUD class]]) {
+                MBProgressHUD *hud = (MBProgressHUD *)_request.hud;
+                hud.progress = progress;
+            }else if ([_request.hud respondsToSelector:@selector(setProgress:)])
+            {
+                [_request.hud setProgress:progress];
+            }
         }
     }];
     
@@ -226,8 +240,14 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
     queue.showError = YES;
     queue.errorDur = [LXDataManager shareDataManager].defaultErrorDur;
         
-    queue.hud = [[MBProgressHUD alloc] init];
-    queue.hud.removeFromSuperViewOnHide = YES;
+    //HUD
+    NSString *hudName = [LXDataManager shareDataManager].defaultHudClassName;
+    HUDView *hud = [[NSClassFromString(hudName) alloc] init];
+    if ([hud isKindOfClass:[MBProgressHUD class]])
+    {
+        ((MBProgressHUD *)hud).removeFromSuperViewOnHide = YES;
+    }
+    queue.hud = hud;
     
     DataQueue __weak  *_queue = queue;
     
@@ -264,9 +284,6 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
         MBProgressHUD *errorHUD = nil;
         UIWindow *window = [LXDataManager lastWindow];
         if (window != nil && _queue.showError && !request.cancelled) {
-            NSError *error = [request error];
-            NSLog(@"request error code:%li", (long)error.code);
-            NSLog(@"request error: %@", error.localizedDescription);
             errorHUD = [MBProgressHUD showHUDAddedTo:window animated:YES];
             errorHUD.removeFromSuperViewOnHide = YES;
             errorHUD.mode = MBProgressHUDModeText;
@@ -293,8 +310,16 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
     [queue setShowAccurateProgress:YES];
     [queue setQueueProgress:^(long long bytes, long long total) {
         //
-        if (_queue.showHUD && (_queue.hud.mode == MBProgressHUDModeAnnularDeterminate || _queue.hud.mode == MBProgressHUDModeDeterminateHorizontalBar|| _queue.hud.mode == MBProgressHUDModeDeterminate)) {
-            _queue.hud.progress = (float)bytes/total;
+        if (_queue.showHUD) {
+            CGFloat progress = (float)bytes/total;
+            if ([_queue.hud isKindOfClass:[MBProgressHUD class]]) {
+                MBProgressHUD *hud = (MBProgressHUD *)_queue.hud;
+                hud.progress = progress;
+            }else if ([_queue.hud respondsToSelector:@selector(setProgress:)])
+            {
+                [_queue.hud setProgress:progress];
+            }
+
         }
     }];
     

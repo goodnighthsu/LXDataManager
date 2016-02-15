@@ -96,8 +96,8 @@
 			isa = PBXGroup;
 			children = (
 				35221C6F1C52181500087FE8 /* MainViewController.xib */,
-				35221C701C52181500087FE8 /* MainViewController.m */,
 				35221C711C52181500087FE8 /* MainViewController.h */,
+				35221C701C52181500087FE8 /* MainViewController.m */,
 			);
 			name = Demo;
 			sourceTree = "<group>";
