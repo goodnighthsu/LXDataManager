@@ -7,6 +7,7 @@
 //
 
 #import "LXDataManager.h"
+#import "NSJSONSerialization+RemoveNull.h"
 
 CGFloat const kErrorDur = 2.0f;
 
@@ -18,9 +19,6 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
 
 
 @implementation DataRequest
-
-
-
 //只能在这里设置Request
 - (void)setCache:(BOOL)cache
 {
@@ -112,6 +110,7 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
     request.showError = YES;
     request.cache = NO;
     request.useLocalCache = NO;
+    request.isRemoveNull = YES;
     request.callback = callback;
     //默认配置
     //失效的、错误的 （不检查更新，检查更新会产生服务器请求）
@@ -214,22 +213,62 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
     return request;
 }
 
-+ (UIWindow *)lastWindow
+#pragma mark - JSON Request
++ (DataRequest *)JSONRequestWithURL:(NSURL *)url callback:(void (^)(NSDictionary *json, BOOL success))callback;
 {
-    NSArray *windows = [UIApplication sharedApplication].windows;
-    for(UIWindow *window in [windows reverseObjectEnumerator])
-    {
-        if ([window isKindOfClass:[UIWindow class]] &&
-            CGRectEqualToRect(window.bounds, [UIScreen mainScreen].bounds) && [NSStringFromClass([window class]) isEqualToString:@"UITextEffectsWindow"])
+    DataRequest *request = [LXDataManager requestWithURL:url callback:^(DataRequest *result, BOOL success) {
+        if (success)
         {
-            return window;
+            [LXDataManager parseJSONWithRequest:result callback:^(NSDictionary *dic, BOOL parseSuccess) {
+                if (callback != nil)
+                {
+                    callback(dic, parseSuccess);
+                }
+            }];
+            
+        }else{
+            if (callback != nil) {
+                callback(nil, NO);
+            }
         }
-    }
+    }];
     
-    return [UIApplication sharedApplication].keyWindow;
+    return request;
 }
 
-#pragma mark 默认DataQueue处理
++ (void)parseJSONWithRequest:(DataRequest *)request callback:(void (^)(NSDictionary *dic, BOOL succsss))callback
+{
+    BOOL success = YES;
+    NSError *error = nil;
+    NSMutableDictionary *dic = nil;
+    id parseResult = nil;
+    if (request.isRemoveNull) {
+        parseResult = [NSJSONSerialization JSONRemoveNullWithData:request.responseData options:NSJSONReadingMutableContainers error:&error];
+    }else
+    {
+        parseResult = [NSJSONSerialization JSONObjectWithData:request.responseData options:NSJSONReadingMutableContainers error:&error];
+    }
+    
+    if ([parseResult isKindOfClass:[NSArray class]]) {
+        dic = [NSMutableDictionary dictionary];
+        [dic setObject:parseResult forKey:@"result"];
+    }
+    
+    if ([parseResult isKindOfClass:[NSDictionary class]]) {
+        dic = parseResult;
+    }
+    
+    if (error != nil) {
+        //解析失败
+        NSLog(@"JSON parse error: %@", error.description);
+        dic = nil;
+        success = NO;
+    }
+    
+    callback(dic, success);
+}
+
+#pragma mark - 默认DataQueue处理
 + (DataQueue *)requestWithRequests:(NSArray *)requests callback:(void (^)(DataQueue *queue, BOOL success))callback
 {
     //Queue
@@ -369,6 +408,22 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
     }
     
     return bundle;
+}
+
+#pragma mark - Last Window
++ (UIWindow *)lastWindow
+{
+    NSArray *windows = [UIApplication sharedApplication].windows;
+    for(UIWindow *window in [windows reverseObjectEnumerator])
+    {
+        if ([window isKindOfClass:[UIWindow class]] &&
+            CGRectEqualToRect(window.bounds, [UIScreen mainScreen].bounds) && [NSStringFromClass([window class]) isEqualToString:@"UITextEffectsWindow"])
+        {
+            return window;
+        }
+    }
+    
+    return [UIApplication sharedApplication].keyWindow;
 }
 @end
 

@@ -10,6 +10,7 @@
 		05ACCB7E43E34239A91E83DE /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E0012B7BA5F644C396CEC7C0 /* libPods.a */; };
 		35221C721C52181500087FE8 /* MainViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 35221C6F1C52181500087FE8 /* MainViewController.xib */; };
 		35221C731C52181500087FE8 /* MainViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 35221C701C52181500087FE8 /* MainViewController.m */; };
+		353176D11C9FCAD500B9FB6C /* NSJSONSerialization+RemoveNull.m in Sources */ = {isa = PBXBuildFile; fileRef = 353176D01C9FCAD500B9FB6C /* NSJSONSerialization+RemoveNull.m */; };
 		357E42F1195D060000E0772E /* LXDataManagerLocalizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 357E42F3195D060000E0772E /* LXDataManagerLocalizable.strings */; };
 		35963A2F18ACB35600A58B82 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35963A2E18ACB35600A58B82 /* Foundation.framework */; };
 		35963A3118ACB35600A58B82 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35963A3018ACB35600A58B82 /* CoreGraphics.framework */; };
@@ -41,6 +42,8 @@
 		35221C6F1C52181500087FE8 /* MainViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainViewController.xib; sourceTree = "<group>"; };
 		35221C701C52181500087FE8 /* MainViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MainViewController.m; sourceTree = "<group>"; };
 		35221C711C52181500087FE8 /* MainViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainViewController.h; sourceTree = "<group>"; };
+		353176CF1C9FCAD500B9FB6C /* NSJSONSerialization+RemoveNull.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSJSONSerialization+RemoveNull.h"; sourceTree = "<group>"; };
+		353176D01C9FCAD500B9FB6C /* NSJSONSerialization+RemoveNull.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSJSONSerialization+RemoveNull.m"; sourceTree = "<group>"; };
 		357E42EF195D04D700E0772E /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		357E42F0195D04D700E0772E /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/InfoPlist.strings"; sourceTree = "<group>"; };
 		357E42F2195D060000E0772E /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LXDataManagerLocalizable.strings"; sourceTree = "<group>"; };
@@ -190,6 +193,8 @@
 			children = (
 				35C1F6E118ADD221005CC16C /* LXDataManager.h */,
 				35C1F6E218ADD221005CC16C /* LXDataManager.m */,
+				353176CF1C9FCAD500B9FB6C /* NSJSONSerialization+RemoveNull.h */,
+				353176D01C9FCAD500B9FB6C /* NSJSONSerialization+RemoveNull.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -338,6 +343,7 @@
 			files = (
 				35963A3F18ACB35600A58B82 /* AppDelegate.m in Sources */,
 				35963A3B18ACB35600A58B82 /* main.m in Sources */,
+				353176D11C9FCAD500B9FB6C /* NSJSONSerialization+RemoveNull.m in Sources */,
 				35C1F6E318ADD221005CC16C /* LXDataManager.m in Sources */,
 				35221C731C52181500087FE8 /* MainViewController.m in Sources */,
 			);

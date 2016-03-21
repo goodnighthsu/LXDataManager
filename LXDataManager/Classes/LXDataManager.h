@@ -31,7 +31,6 @@
 
 @end
 
-
 #pragma mark - DataRequest
 /// DataRequest ASIFormDataRequest+HUD
 @interface DataRequest : ASIFormDataRequest
@@ -68,6 +67,9 @@
  @breif 直接使用本地的缓存，速度比使用ASIOnlyLoadIfNotCachedCachePolicy ASIAskServerIfModifiedCachePolicy快, 如果没有缓存依据当前的CachePolicy继续执行
  */
 @property (assign, nonatomic) BOOL useLocalCache;
+
+///移除JSON中的null
+@property (assign, nonatomic) BOOL isRemoveNull;
 
 ///回调方法
 @property (copy, nonatomic) void (^callback)(DataRequest *request, BOOL success);
@@ -122,6 +124,13 @@
  @return DataRequest
  */
 + (DataRequest *)requestWithURL:(NSURL *)url callback:(void (^)(DataRequest *result, BOOL success))callback;
+
+/** 返回JSON格式的Request
+ @param url URL
+ @param callback block回调提供DataQuest 结果， success请求成功与否
+ @return DataRequest
+ */
++ (DataRequest *)JSONRequestWithURL:(NSURL *)url callback:(void (^)(NSDictionary *json, BOOL success))callback;
 
 /** 批量下载*/
 + (DataQueue *)requestWithRequests:(NSArray *)requests callback:(void (^)(DataQueue *result, BOOL success))callback;

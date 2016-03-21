@@ -10,16 +10,16 @@ PODS:
     - Reachability
   - LX_ASIHttpRequest/S3 (1.9.3):
     - Reachability
-  - MBProgressHUD (0.8)
+  - MBProgressHUD (0.9.2)
   - Reachability (3.1.1)
 
 DEPENDENCIES:
   - LX_ASIHttpRequest (~> 1.9)
-  - MBProgressHUD (~> 0.8)
+  - MBProgressHUD (~> 0.9.2)
 
 SPEC CHECKSUMS:
   LX_ASIHttpRequest: 41ddc10d092461d16fab994b0d6561723cf69368
-  MBProgressHUD: 8688c331cb64702283be37ab8d7d329cdd25f251
+  MBProgressHUD: 1569cf7ace17a8bac47aabfbb8580a49690386d1
   Reachability: dd9aa4fb6667b9f787690a74f53cb7634ce99893
 
 COCOAPODS: 0.38.2
