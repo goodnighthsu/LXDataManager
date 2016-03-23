@@ -7,13 +7,13 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <ASIHTTPRequest.h>
-#import <ASIFormDataRequest.h>
-#import <ASINetworkQueue.h>
-#import <ASIDownloadCache.h>
+#import "ASIHTTPRequest.h"
+#import "ASIFormDataRequest.h"
+#import "ASINetworkQueue.h"
+#import "ASIDownloadCache.h"
 #import "MBProgressHUD.h"
-
-///Ver 0.5.0
+#import <PromiseKit/PromiseKit.h>
+///Ver 0.6.0
 #pragma mark - HUDView
 @protocol HUD
 
@@ -30,6 +30,8 @@
 - (void)setProgress:(CGFloat)progress;
 
 @end
+
+@class PMKPromise;
 
 #pragma mark - DataRequest
 /// DataRequest ASIFormDataRequest+HUD
@@ -68,11 +70,16 @@
  */
 @property (assign, nonatomic) BOOL useLocalCache;
 
+///
+@property (assign, nonatomic) BOOL isJSON;
+
 ///移除JSON中的null
 @property (assign, nonatomic) BOOL isRemoveNull;
 
 ///回调方法
-@property (copy, nonatomic) void (^callback)(DataRequest *request, BOOL success);
+@property (copy, nonatomic) void (^callback)(id, BOOL success);
+
+- (PMKPromise *)promise;
 
 @end
 
@@ -99,7 +106,6 @@
 ///默认显示Error
 @property (assign, nonatomic) BOOL showError;
 
-
 @end
 
 #pragma mark - LXDataManager
@@ -123,14 +129,14 @@
  @param callback block回调提供DataQuest 结果， success请求成功与否
  @return DataRequest
  */
-+ (DataRequest *)requestWithURL:(NSURL *)url callback:(void (^)(DataRequest *result, BOOL success))callback;
++ (DataRequest *)requestWithURL:(NSURL *)url callback:(void (^)(id, BOOL success))callback;
 
 /** 返回JSON格式的Request
  @param url URL
  @param callback block回调提供DataQuest 结果， success请求成功与否
  @return DataRequest
  */
-+ (DataRequest *)JSONRequestWithURL:(NSURL *)url callback:(void (^)(NSDictionary *json, BOOL success))callback;
++ (DataRequest *)JSONRequestWithURL:(NSURL *)url callback:(void (^)(id json, BOOL success))callback;
 
 /** 批量下载*/
 + (DataQueue *)requestWithRequests:(NSArray *)requests callback:(void (^)(DataQueue *result, BOOL success))callback;

@@ -8,6 +8,9 @@
 
 #import "MainViewController.h"
 #import "LXDataManager.h"
+#import <PromiseKit/PromiseKit.h>
+#import "PromiseKit/Promise+When.h"
+
 
 #define kRequest_Once
 
@@ -126,7 +129,10 @@
     [LXDataManager shareDataManager].defaultErrorNetwork = @"网络连接中断";
     [LXDataManager shareDataManager].defaultHudClassName = @"LineProgressHUD";
     
-    [self JSONRequest];
+    //Promise Request
+    [self promiseRequest];
+    //JSON Request
+    //[self JSONRequest];
     
     /*
 #ifdef kRequest_Once
@@ -185,6 +191,48 @@
     
 #endif
      */
+}
+
+- (void)promiseRequest
+{
+    NSURL *url = [NSURL URLWithString:@"http://127.0.0.1:3000/api/user/1"];
+    DataRequest *request1 = [DataRequest requestWithURL:url];
+    request1.isJSON = YES;
+    
+    DataRequest *request2 = [DataRequest requestWithURL:url];
+    request2.isJSON = YES;
+    
+    id promise1 = [request1 promise];
+    id promise2 = [request2 promise];
+    
+    [PMKPromise when:(@[promise1, promise2])].then(^(NSArray *results)
+                                                  {
+                                                      NSLog(@"results: %@", results);
+                                                  });
+    
+//    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+//    hud.removeFromSuperViewOnHide = YES;
+//    
+//    [request1 promise].then(^(NSDictionary *dic)
+//                            {
+//                                NSLog(@"result: %@", dic);
+//                                NSURL *url2 = [NSURL URLWithString:@"http://127.0.0.1:3000/api/user/2"];
+//                                DataRequest *request2 = [DataRequest requestWithURL:url2];
+//                                request2.isJSON = YES;
+//                                return [request2 promise];
+//                            })
+//    .then(^(NSDictionary *dic)
+//          {
+//              NSLog(@"result2: %@", dic);
+//          })
+//    .catch(^(NSError *error)
+//           {
+//               NSLog(@"error: %@", error.description);
+//           })
+//    .finally(^
+//             {
+//                 [hud hide:YES];
+//             });
 }
 
 - (void)JSONRequest

@@ -60,6 +60,24 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
     }
 }
 
+- (PMKPromise *)promise
+{
+    return [PMKPromise promiseWithResolver:^(PMKResolver resolve) {
+        DataRequest *tempRequest = [LXDataManager requestWithURL:url callback:^(id result, BOOL success) {
+            resolve(result);
+        }];
+        
+        tempRequest.showHUD = NO;
+        tempRequest.showError = NO;
+        tempRequest.cache = self.cache;
+        tempRequest.useLocalCache = self.useLocalCache;
+        tempRequest.isJSON = self.isJSON;
+        tempRequest.isRemoveNull = self.isRemoveNull;
+        
+        [tempRequest startAsynchronous];
+    }];
+}
+
 @end
 
 
@@ -103,21 +121,14 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
 }
 
 #pragma mark - 默认ASIFormDataRequest 处理
-+ (DataRequest *)requestWithURL:(NSURL *)url callback:(void (^)(DataRequest *result, BOOL))callback{
-    __autoreleasing DataRequest *request = [DataRequest requestWithURL:url];
-    //默认
-    request.showHUD = YES;
-    request.showError = YES;
-    request.cache = NO;
-    request.useLocalCache = NO;
-    request.isRemoveNull = YES;
-    request.callback = callback;
++ (void)configRequest:(DataRequest *)request
+{
     //默认配置
     //失效的、错误的 （不检查更新，检查更新会产生服务器请求）
     [request setCachePolicy:ASIAskServerIfModifiedWhenStaleCachePolicy|ASIFallbackToCacheIfLoadFailsCachePolicy];
     //永久
     request.cacheStoragePolicy = ASICachePermanentlyCacheStoragePolicy;
-
+    
     [request setRequestMethod:@"GET"];
     
     request.errorDur = [LXDataManager shareDataManager].defaultErrorDur;
@@ -161,7 +172,7 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
     [request setFailedBlock:^{
         //移除Start的默认HUD
         [_request.hud hide:YES];
-
+        
         //显示错误用的HUD
         MBProgressHUD *errorHUD = nil;
         UIWindow *window = [LXDataManager lastWindow];
@@ -175,8 +186,8 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
             [errorHUD hide:YES afterDelay:_request.errorDur];
         }
         
-        if (callback != nil) {
-             callback(_request, NO);
+        if (_request.callback != nil) {
+            _request.callback(_request.error, NO);
         }
     }];
     
@@ -187,8 +198,14 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
             [_request.hud hide:YES];
         }
         //返回
-        if (callback != nil) {
-            callback(_request, YES);
+        if (request.callback != nil) {
+            if (_request.isJSON) {
+                [LXDataManager parseJSONWithRequest:_request callback:^(NSDictionary *dic, BOOL succsss) {
+                    _request.callback(dic, succsss);
+                }];
+            }else{
+                _request.callback(_request, YES);
+            }
         }
     }];
     
@@ -209,17 +226,31 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
             }
         }
     }];
+}
+
++ (DataRequest *)requestWithURL:(NSURL *)url callback:(void (^)(id, BOOL))callback{
+    __autoreleasing DataRequest *request = [DataRequest requestWithURL:url];
+    //默认
+    request.showHUD = YES;
+    request.showError = YES;
+    request.cache = NO;
+    request.useLocalCache = NO;
+    request.isJSON = NO;
+    request.isRemoveNull = YES;
+    request.callback = callback;
+    
+    [LXDataManager configRequest:request];
     
     return request;
 }
 
 #pragma mark - JSON Request
-+ (DataRequest *)JSONRequestWithURL:(NSURL *)url callback:(void (^)(NSDictionary *json, BOOL success))callback;
++ (DataRequest *)JSONRequestWithURL:(NSURL *)url callback:(void (^)(id json, BOOL success))callback;
 {
     DataRequest *request = [LXDataManager requestWithURL:url callback:^(DataRequest *result, BOOL success) {
         if (success)
         {
-            [LXDataManager parseJSONWithRequest:result callback:^(NSDictionary *dic, BOOL parseSuccess) {
+            [LXDataManager parseJSONWithRequest:result callback:^(id dic, BOOL parseSuccess) {
                 if (callback != nil)
                 {
                     callback(dic, parseSuccess);
@@ -236,7 +267,7 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
     return request;
 }
 
-+ (void)parseJSONWithRequest:(DataRequest *)request callback:(void (^)(NSDictionary *dic, BOOL succsss))callback
++ (void)parseJSONWithRequest:(DataRequest *)request callback:(void (^)(id dic, BOOL succsss))callback
 {
     BOOL success = YES;
     NSError *error = nil;
@@ -263,9 +294,10 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
         NSLog(@"JSON parse error: %@", error.description);
         dic = nil;
         success = NO;
+        callback(error, NO);
+    }else{
+        callback(dic, YES);
     }
-    
-    callback(dic, success);
 }
 
 #pragma mark - 默认DataQueue处理
