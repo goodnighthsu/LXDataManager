@@ -9,8 +9,6 @@
 #import "MainViewController.h"
 #import "LXDataManager.h"
 #import <PromiseKit/PromiseKit.h>
-#import "PromiseKit/Promise+When.h"
-
 
 #define kRequest_Once
 
@@ -205,10 +203,15 @@
     id promise1 = [request1 promise];
     id promise2 = [request2 promise];
     
-    [PMKPromise when:(@[promise1, promise2])].then(^(NSArray *results)
-                                                  {
-                                                      NSLog(@"results: %@", results);
-                                                  });
+    PMKWhen(@[promise1, promise2]).then(^(NSArray *results)
+                                        {
+                                            NSLog(@"results: %@", results);
+                                        });
+    
+//    [AnyPromise when:(@[promise1, promise2])].then(^(NSArray *results)
+//                                                  {
+//                                                      NSLog(@"results: %@", results);
+//                                                  });
     
 //    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
 //    hud.removeFromSuperViewOnHide = YES;

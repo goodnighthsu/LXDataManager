@@ -12,7 +12,8 @@
 #import "ASINetworkQueue.h"
 #import "ASIDownloadCache.h"
 #import "MBProgressHUD.h"
-#import <PromiseKit/PromiseKit.h>
+#import "PromiseKit/PromiseKit.h"
+
 ///Ver 0.6.0
 #pragma mark - HUDView
 @protocol HUD
@@ -31,7 +32,7 @@
 
 @end
 
-@class PMKPromise;
+@class AnyPromise;
 
 #pragma mark - DataRequest
 /// DataRequest ASIFormDataRequest+HUD
@@ -79,7 +80,7 @@
 ///回调方法
 @property (copy, nonatomic) void (^callback)(id, BOOL success);
 
-- (PMKPromise *)promise;
+- (AnyPromise *)promise;
 
 @end
 

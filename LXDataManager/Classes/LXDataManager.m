@@ -60,8 +60,24 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
     }
 }
 
-- (PMKPromise *)promise
+- (AnyPromise *)promise
 {
+    return [AnyPromise promiseWithResolverBlock:^(PMKResolver  _Nonnull resolve) {
+        DataRequest *tempRequest = [LXDataManager requestWithURL:url callback:^(id result, BOOL success) {
+            resolve(result);
+        }];
+        
+        tempRequest.showHUD = NO;
+        tempRequest.showError = NO;
+        tempRequest.cache = self.cache;
+        tempRequest.useLocalCache = self.useLocalCache;
+        tempRequest.isJSON = self.isJSON;
+        tempRequest.isRemoveNull = self.isRemoveNull;
+        
+        [tempRequest startAsynchronous];
+    }];
+    
+    /**Promise 1.5 写法
     return [PMKPromise promiseWithResolver:^(PMKResolver resolve) {
         DataRequest *tempRequest = [LXDataManager requestWithURL:url callback:^(id result, BOOL success) {
             resolve(result);
@@ -76,6 +92,7 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
         
         [tempRequest startAsynchronous];
     }];
+     */
 }
 
 @end

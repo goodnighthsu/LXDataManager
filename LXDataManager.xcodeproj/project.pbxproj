@@ -24,7 +24,7 @@
 		35963A5218ACB35600A58B82 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 35963A5018ACB35600A58B82 /* InfoPlist.strings */; };
 		35963A5418ACB35600A58B82 /* LXDataManagerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 35963A5318ACB35600A58B82 /* LXDataManagerTests.m */; };
 		35C1F6E318ADD221005CC16C /* LXDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 35C1F6E218ADD221005CC16C /* LXDataManager.m */; };
-		FC7A6D8338BDD3892A0C6AB5 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DC4243A69BAE3E5AD75D33F /* libPods.a */; };
+		82516644996D2E6AF51F6011 /* Pods.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9DD670812D061E5AA9C1AB54 /* Pods.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,7 +66,7 @@
 		35963A5318ACB35600A58B82 /* LXDataManagerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LXDataManagerTests.m; sourceTree = "<group>"; };
 		35C1F6E118ADD221005CC16C /* LXDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LXDataManager.h; sourceTree = "<group>"; };
 		35C1F6E218ADD221005CC16C /* LXDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LXDataManager.m; sourceTree = "<group>"; };
-		4DC4243A69BAE3E5AD75D33F /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		9DD670812D061E5AA9C1AB54 /* Pods.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B98D16C193FC0C4FCF51C16F /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -78,7 +78,7 @@
 				35963A3118ACB35600A58B82 /* CoreGraphics.framework in Frameworks */,
 				35963A3318ACB35600A58B82 /* UIKit.framework in Frameworks */,
 				35963A2F18ACB35600A58B82 /* Foundation.framework in Frameworks */,
-				FC7A6D8338BDD3892A0C6AB5 /* libPods.a in Frameworks */,
+				82516644996D2E6AF51F6011 /* Pods.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -140,7 +140,7 @@
 				35963A3018ACB35600A58B82 /* CoreGraphics.framework */,
 				35963A3218ACB35600A58B82 /* UIKit.framework */,
 				35963A4718ACB35600A58B82 /* XCTest.framework */,
-				4DC4243A69BAE3E5AD75D33F /* libPods.a */,
+				9DD670812D061E5AA9C1AB54 /* Pods.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -220,6 +220,7 @@
 				35963A2818ACB35600A58B82 /* Frameworks */,
 				35963A2918ACB35600A58B82 /* Resources */,
 				7E96508DF02C4A0CA0A05039 /* Copy Pods Resources */,
+				7C4E53CAEAFE24EFDEA37517 /* Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -317,6 +318,21 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		7C4E53CAEAFE24EFDEA37517 /* Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		7E96508DF02C4A0CA0A05039 /* Copy Pods Resources */ = {
@@ -476,9 +492,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "LXDataManager/LXDataManager-Prefix.pch";
 				INFOPLIST_FILE = "LXDataManager/LXDataManager-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -490,9 +509,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "LXDataManager/LXDataManager-Prefix.pch";
 				INFOPLIST_FILE = "LXDataManager/LXDataManager-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
