@@ -13,7 +13,7 @@
 #import "ASIDownloadCache.h"
 #import "MBProgressHUD.h"
 #import <PromiseKit/PromiseKit.h>
-///Ver 0.6.0
+///Ver 0.6.1
 #pragma mark - HUDView
 @protocol HUD
 
@@ -55,7 +55,7 @@
 /**hud的SuperView
  @breif 默认window, 错误消息忽略hudSuperView, 显示在window
  */
-@property (weak, nonatomic) UIView *hudSuperView;
+@property (strong, nonatomic) UIView *hudSuperView;
 
 /**错误显示时间
  @breif 默认 2s
@@ -96,7 +96,7 @@
 /**hud的SuperView
  @breif 默认window, 错误消息忽略hudSuperView, 显示在window
  */
-@property (weak, nonatomic) UIView *hudSuperView;
+@property (strong, nonatomic) UIView *hudSuperView;
 
 /**错误显示时间
  @breif 默认 2s
