@@ -141,7 +141,7 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
     }
     request.hud = hud;
     
-    DataRequest __weak *_request = request;
+    DataRequest  *_request = request;
     //Start
     [request setStartedBlock:^{
         if (_request.showHUD) {
@@ -320,7 +320,7 @@ ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStorag
     }
     queue.hud = hud;
     
-    DataQueue __weak  *_queue = queue;
+    DataQueue *_queue = queue;
     
     //Start
     [queue setQueueStart:^() {
