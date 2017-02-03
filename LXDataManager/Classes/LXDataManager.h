@@ -7,11 +7,11 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "ASIHTTPRequest.h"
-#import "ASIFormDataRequest.h"
-#import "ASINetworkQueue.h"
-#import "ASIDownloadCache.h"
-#import "MBProgressHUD.h"
+#import <LX_ASIHttpRequest/ASIHTTPRequest.h>
+#import <LX_ASIHttpRequest/ASIFormDataRequest.h>
+#import <LX_ASIHttpRequest/ASINetworkQueue.h>
+#import <LX_ASIHttpRequest/ASIDownloadCache.h>
+#import <MBProgressHUD/MBProgressHUD.h>
 #import <PromiseKit/PromiseKit.h>
 ///Ver 0.6.1
 #pragma mark - HUDView

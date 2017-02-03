@@ -195,12 +195,12 @@
 
 - (void)promiseRequest
 {
-    NSURL *url = [NSURL URLWithString:@"http://127.0.0.1:3000/api/user/1"];
+    NSURL *url = [NSURL URLWithString:@"http://www.baidu.com/"];
     DataRequest *request1 = [DataRequest requestWithURL:url];
-    request1.isJSON = YES;
+    request1.isJSON = NO;
     
     DataRequest *request2 = [DataRequest requestWithURL:url];
-    request2.isJSON = YES;
+    request2.isJSON = NO;
     
     id promise1 = [request1 promise];
     id promise2 = [request2 promise];

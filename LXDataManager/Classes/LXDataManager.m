@@ -17,6 +17,21 @@ CGFloat const kErrorDur = 2.0f;
 
 ASICacheStoragePolicy const kCacheStoragePolicy = ASICachePermanentlyCacheStoragePolicy;
 
+@implementation HUDView
+
+- (void)show:(BOOL)ani{
+    
+}
+
+- (void)hide:(BOOL)ani{
+    
+}
+
+- (void)setProgress:(CGFloat)progress{
+    
+}
+
+@end
 
 @implementation DataRequest
 //只能在这里设置Request
