@@ -6,7 +6,7 @@ source 'https://github.com/CocoaPods/Specs.git'
 def import_pods
     pod 'LX_ASIHttpRequest', '~> 1.9'
     pod 'MBProgressHUD'
-    pod 'PromiseKit', '~> 1.5'
+    pod 'PromiseKit', '~> 1.7.6'
 end
 
 target 'LXDataManager' do
